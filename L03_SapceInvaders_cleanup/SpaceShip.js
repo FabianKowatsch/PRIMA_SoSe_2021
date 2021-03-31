@@ -5,7 +5,7 @@ var SpaceInvaders;
     class SpaceShip extends f.Node {
         constructor() {
             super("SpaceShip");
-            let scale = new f.Vector3(1, 0.5, 0);
+            let scale = new f.Vector3(1, 1, 0);
             let transform = new f.ComponentTransform();
             transform.mtxLocal.scale(scale);
             this.addComponent(transform);

@@ -11,17 +11,16 @@ var SpaceInvaders;
             transform.mtxLocal.translate(translate);
             transform.mtxLocal.scale(scale);
             this.addComponent(transform);
-            for (let i = 0; i < 10; i++) {
-                for (let j = 0; j < 10; j++) {
-                    if (!((j < 2 && i > 1 && i < 8) ||
-                        (j < 3 && i > 2 && i < 7) ||
-                        (j < 4 && i > 3 && i < 6) ||
-                        (j > 7 && (i < 1 || i > 8)) ||
-                        (j > 8 && (i < 2 || i > 7)))) {
-                        let x = -0.45 + i / 10;
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 9; j++) {
+                    if ((i > 2 || i + j > 4) && i + j < 11) {
+                        let x1 = -0.05 - i / 10;
                         let y = -0.45 + j / 10;
-                        let subPart = new SpaceInvaders.BarrierSubPart(x, y);
-                        this.addChild(subPart);
+                        let subPart1 = new SpaceInvaders.BarrierSubPart(x1, y);
+                        this.addChild(subPart1);
+                        let x2 = 0.05 + i / 10;
+                        let subPart2 = new SpaceInvaders.BarrierSubPart(x2, y);
+                        this.addChild(subPart2);
                     }
                 }
             }

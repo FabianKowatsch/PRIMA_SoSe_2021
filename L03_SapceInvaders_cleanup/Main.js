@@ -12,7 +12,18 @@ var SpaceInvaders;
     SpaceInvaders.whiteMaterial = new f.Material("Mat", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 1, 1, 1)));
     SpaceInvaders.barrierMesh = new f.MeshCube("barrierCube");
     SpaceInvaders.greenMaterial = new f.Material("Mat", f.ShaderUniColor, new f.CoatColored(new f.Color(0.3, 1, 0, 1)));
-    SpaceInvaders.spaceShipMesh = new f.MeshCube("ShipCube");
+    const vectorArray = [
+        new f.Vector2(0.1, 0),
+        new f.Vector2(0.5, 0),
+        new f.Vector2(0.5, 0.3),
+        new f.Vector2(0, 0.3),
+        new f.Vector2(0.1, 0.5),
+        new f.Vector2(-0.1, 0.5),
+        new f.Vector2(-0.1, 0.3),
+        new f.Vector2(-0.5, 0.3),
+        new f.Vector2(-0.5, 0),
+    ];
+    SpaceInvaders.spaceShipMesh = new f.MeshPolygon("ShipCube", vectorArray, true);
     const root = new f.Node("Root");
     const invaderNode = new f.Node("Invaders");
     const barrierNode = new f.Node("Barriers");

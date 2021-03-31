@@ -4,7 +4,7 @@ namespace SpaceInvaders {
     constructor() {
       super("SpaceShip");
 
-      let scale: f.Vector3 = new f.Vector3(1, 0.5, 0);
+      let scale: f.Vector3 = new f.Vector3(1, 1, 0);
       let transform: f.ComponentTransform = new f.ComponentTransform();
       transform.mtxLocal.scale(scale);
 

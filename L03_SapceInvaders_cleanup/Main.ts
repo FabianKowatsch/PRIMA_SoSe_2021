@@ -20,7 +20,22 @@ namespace SpaceInvaders {
     f.ShaderUniColor,
     new f.CoatColored(new f.Color(0.3, 1, 0, 1))
   );
-  export const spaceShipMesh: f.MeshCube = new f.MeshCube("ShipCube");
+  const vectorArray: Array<f.Vector2> = [
+    new f.Vector2(0.1, 0),
+    new f.Vector2(0.5, 0),
+    new f.Vector2(0.5, 0.3),
+    new f.Vector2(0, 0.3),
+    new f.Vector2(0.1, 0.5),
+    new f.Vector2(-0.1, 0.5),
+    new f.Vector2(-0.1, 0.3),
+    new f.Vector2(-0.5, 0.3),
+    new f.Vector2(-0.5, 0),
+  ];
+  export const spaceShipMesh: f.MeshPolygon = new f.MeshPolygon(
+    "ShipCube",
+    vectorArray,
+    true
+  );
 
   const root: f.Node = new f.Node("Root");
   const invaderNode: f.Node = new f.Node("Invaders");

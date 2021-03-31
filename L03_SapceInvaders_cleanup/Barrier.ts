@@ -10,21 +10,16 @@ namespace SpaceInvaders {
       transform.mtxLocal.scale(scale);
       this.addComponent(transform);
 
-      for (let i: number = 0; i < 10; i++) {
-        for (let j: number = 0; j < 10; j++) {
-          if (
-            !(
-              (j < 2 && i > 1 && i < 8) ||
-              (j < 3 && i > 2 && i < 7) ||
-              (j < 4 && i > 3 && i < 6) ||
-              (j > 7 && (i < 1 || i > 8)) ||
-              (j > 8 && (i < 2 || i > 7))
-            )
-          ) {
-            let x: number = -0.45 + i / 10;
+      for (let i: number = 0; i < 5; i++) {
+        for (let j: number = 0; j < 9; j++) {
+          if ((i > 2 || i + j > 4) && i + j < 11) {
+            let x1: number = -0.05 - i / 10;
             let y: number = -0.45 + j / 10;
-            let subPart: BarrierSubPart = new BarrierSubPart(x, y);
-            this.addChild(subPart);
+            let subPart1: BarrierSubPart = new BarrierSubPart(x1, y);
+            this.addChild(subPart1);
+            let x2: number = 0.05 + i / 10;
+            let subPart2: BarrierSubPart = new BarrierSubPart(x2, y);
+            this.addChild(subPart2);
           }
         }
       }
