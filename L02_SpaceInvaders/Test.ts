@@ -2,9 +2,9 @@ namespace L01_FirstFudge {
   import f = FudgeCore;
 
   // const frameRate: number = 60;
-  const enemiesPerRow: number = 7;
+  const enemiesPerRow: number = 9;
   const rowAmount: number = 3;
-  const barrierAmount: number = 4;
+  const barrierAmount: number = 5;
   const startPosX: number = -(enemiesPerRow - 1) / 2;
   const startPosY: number = 8;
 
@@ -22,9 +22,9 @@ namespace L01_FirstFudge {
   });
 
   let viewport: f.Viewport = new f.Viewport();
-  window.addEventListener("load", hndlLoad);
+  window.addEventListener("load", init);
 
-  function hndlLoad(_event: Event): void {
+  function init(_event: Event): void {
     const canvas: HTMLCanvasElement = document.querySelector("#viewport");
     let cmpCamera: f.ComponentCamera = new f.ComponentCamera();
     cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));

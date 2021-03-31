@@ -3,9 +3,9 @@ var L01_FirstFudge;
 (function (L01_FirstFudge) {
     var f = FudgeCore;
     // const frameRate: number = 60;
-    const enemiesPerRow = 7;
+    const enemiesPerRow = 9;
     const rowAmount = 3;
-    const barrierAmount = 4;
+    const barrierAmount = 5;
     const startPosX = -(enemiesPerRow - 1) / 2;
     const startPosY = 8;
     const root = new f.Node("Root");
@@ -20,8 +20,8 @@ var L01_FirstFudge;
         root.addChild(enemy);
     });
     let viewport = new f.Viewport();
-    window.addEventListener("load", hndlLoad);
-    function hndlLoad(_event) {
+    window.addEventListener("load", init);
+    function init(_event) {
         const canvas = document.querySelector("#viewport");
         let cmpCamera = new f.ComponentCamera();
         cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));
