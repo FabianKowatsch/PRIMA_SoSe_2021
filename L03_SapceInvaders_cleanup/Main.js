@@ -21,7 +21,7 @@ var SpaceInvaders;
         new f.Vector2(-0.1, 0.5),
         new f.Vector2(-0.1, 0.3),
         new f.Vector2(-0.5, 0.3),
-        new f.Vector2(-0.5, 0),
+        new f.Vector2(-0.5, 0)
     ];
     SpaceInvaders.spaceShipMesh = new f.MeshPolygon("ShipCube", vectorArray, true);
     const root = new f.Node("Root");
@@ -30,13 +30,13 @@ var SpaceInvaders;
     createEnemies();
     createSpaceShip();
     createBarriers();
+    let cmpCamera = new f.ComponentCamera();
+    cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));
+    cmpCamera.mtxPivot.rotateY(180);
     let viewport = new f.Viewport();
     window.addEventListener("load", init);
     function init(_event) {
         const canvas = document.querySelector("#viewport");
-        let cmpCamera = new f.ComponentCamera();
-        cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));
-        cmpCamera.mtxPivot.rotateY(180);
         console.log(root);
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
