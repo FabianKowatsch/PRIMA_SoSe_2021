@@ -15,10 +15,14 @@ namespace SpaceInvaders {
           if ((i > 2 || i + j > 4) && i + j < 11) {
             let x1: number = -0.05 - i / 10;
             let y: number = -0.45 + j / 10;
-            let subPart1: BarrierSubPart = new BarrierSubPart(x1, y);
+            let subPart1: BarrierSubPart = new BarrierSubPart(
+              new f.Vector2(x1, y)
+            );
             this.addChild(subPart1);
             let x2: number = 0.05 + i / 10;
-            let subPart2: BarrierSubPart = new BarrierSubPart(x2, y);
+            let subPart2: BarrierSubPart = new BarrierSubPart(
+              new f.Vector2(x2, y)
+            );
             this.addChild(subPart2);
           }
         }

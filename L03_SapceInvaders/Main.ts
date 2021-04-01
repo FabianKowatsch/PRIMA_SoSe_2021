@@ -7,50 +7,26 @@ namespace SpaceInvaders {
   const rowAmount: number = 4;
   const barrierAmount: number = 5;
   const startPosX: number = -(enemiesPerRow - 1) / 2;
-  const startPosY: number = 10;
-
-  export const enemyMesh: f.MeshSphere = new f.MeshSphere("EnemySphere", 10, 9);
-  export const whiteMaterial: f.Material = new f.Material(
-    "Mat",
-    f.ShaderUniColor,
-    new f.CoatColored(new f.Color(1, 1, 1, 1))
-  );
-  export const barrierMesh: f.MeshCube = new f.MeshCube("barrierCube");
-  export const greenMaterial: f.Material = new f.Material(
-    "Mat",
-    f.ShaderUniColor,
-    new f.CoatColored(new f.Color(0.3, 1, 0, 1))
-  );
-  const vectorArray: Array<f.Vector2> = [
-    new f.Vector2(0.1, 0),
-    new f.Vector2(0.5, 0),
-    new f.Vector2(0.5, 0.3),
-    new f.Vector2(0, 0.3),
-    new f.Vector2(0.1, 0.5),
-    new f.Vector2(-0.1, 0.5),
-    new f.Vector2(-0.1, 0.3),
-    new f.Vector2(-0.5, 0.3),
-    new f.Vector2(-0.5, 0)
-  ];
-  export const spaceShipMesh: f.MeshPolygon = new f.MeshPolygon(
-    "ShipCube",
-    vectorArray,
-    true
-  );
+  const startPosY: number = 9;
+  const maxHeight: number = 12;
+  let fireTimeout: boolean = false;
+  const playerProjectileSpeed: number = 10;
 
   const root: f.Node = new f.Node("Root");
   const invaderNode: f.Node = new f.Node("Invaders");
   const barrierNode: f.Node = new f.Node("Barriers");
   createEnemies();
+  createMothership();
   createSpaceShip();
   createBarriers();
-  const spaceShip: f.Node = root.getChild(1);
+  const spaceShip: f.Node = root.getChildrenByName("SpaceShip")[0];
   let cmpCamera: f.ComponentCamera = new f.ComponentCamera();
   cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));
   cmpCamera.mtxPivot.rotateY(180);
 
   let viewport: f.Viewport = new f.Viewport();
   window.addEventListener("load", init);
+  window.addEventListener("keydown", hndKeyDown);
 
   function init(_event: Event): void {
     const canvas: HTMLCanvasElement = document.querySelector("#viewport");
@@ -73,13 +49,27 @@ namespace SpaceInvaders {
         (movementSpeed * f.Loop.timeFrameReal) / 1000
       );
     }
+
+    root.getChildrenByName("Projectile").forEach((projectile) => {
+      projectile.mtxLocal.translateY(
+        (playerProjectileSpeed * f.Loop.timeFrameReal) / 1000
+      );
+      if (projectile.mtxLocal.get()[13] >= maxHeight) {
+        projectile.activate(false);
+      }
+    });
+  }
+  function hndKeyDown(_event: KeyboardEvent): void {
+    if (_event.code === "Space") fireBullet();
   }
 
   function createEnemies(): void {
     let counterRow: number = 0;
     let counterEnemies: number = 0;
     for (let i: number = 0; i < enemiesPerRow * rowAmount; i++) {
-      let invader: Invader = new Invader(counterEnemies, -counterRow);
+      let invader: Invader = new Invader(
+        new f.Vector2(counterEnemies, -counterRow)
+      );
       invaderNode.appendChild(invader);
 
       if (counterEnemies === enemiesPerRow - 1) {
@@ -101,6 +91,11 @@ namespace SpaceInvaders {
     root.appendChild(spaceShip);
   }
 
+  function createMothership(): void {
+    let spaceShip: Mothership = new Mothership(new f.Vector2(0, startPosY + 1));
+    root.appendChild(spaceShip);
+  }
+
   function createBarriers(): void {
     let counter: number = 0;
     for (let i: number = 0; i < barrierAmount; i++) {
@@ -109,5 +104,18 @@ namespace SpaceInvaders {
       counter += -((2 * startPosX) / (barrierAmount - 1));
     }
     root.appendChild(barrierNode);
+  }
+  function fireBullet(): void {
+    if (fireTimeout === true) return;
+    let spaceShipPos: f.Vector2 = new f.Vector2(
+      spaceShip.mtxLocal.get()[12],
+      1
+    );
+    let bullet: Projectile = new Projectile(spaceShipPos);
+    root.addChild(bullet);
+    fireTimeout = true;
+    setTimeout(() => {
+      fireTimeout = false;
+    }, 1000);
   }
 }
