@@ -2,7 +2,8 @@
 var SpaceInvaders;
 (function (SpaceInvaders) {
     var f = FudgeCore;
-    // const frameRate: number = 60;
+    const frameRate = 60;
+    const movementSpeed = 5;
     const enemiesPerRow = 9;
     const rowAmount = 4;
     const barrierAmount = 5;
@@ -30,6 +31,7 @@ var SpaceInvaders;
     createEnemies();
     createSpaceShip();
     createBarriers();
+    const spaceShip = root.getChild(1);
     let cmpCamera = new f.ComponentCamera();
     cmpCamera.mtxPivot.translate(new f.Vector3(0, 5, 15));
     cmpCamera.mtxPivot.rotateY(180);
@@ -40,6 +42,17 @@ var SpaceInvaders;
         console.log(root);
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         viewport.draw();
+        f.Loop.start(f.LOOP_MODE.TIME_REAL, frameRate);
+        f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+    }
+    function update(_event) {
+        viewport.draw();
+        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
+            spaceShip.mtxLocal.translateX(-(movementSpeed * f.Loop.timeFrameReal) / 1000);
+        }
+        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D])) {
+            spaceShip.mtxLocal.translateX((movementSpeed * f.Loop.timeFrameReal) / 1000);
+        }
     }
     function createEnemies() {
         let counterRow = 0;
