@@ -7,10 +7,10 @@ var SpaceInvaders;
             super("Barrier" + _x + "/" + _y);
             let translate = new f.Vector3(_x, _y, 0);
             let scale = new f.Vector3(0.1, 0.1, 0);
-            let transform = new f.ComponentTransform();
-            transform.mtxLocal.translate(translate);
-            transform.mtxLocal.scale(scale);
-            this.addComponent(transform);
+            let cmpTransform = new f.ComponentTransform();
+            cmpTransform.mtxLocal.translate(translate);
+            cmpTransform.mtxLocal.scale(scale);
+            this.addComponent(cmpTransform);
             this.addComponent(new f.ComponentMaterial(SpaceInvaders.greenMaterial));
             this.addComponent(new f.ComponentMesh(SpaceInvaders.barrierMesh));
         }

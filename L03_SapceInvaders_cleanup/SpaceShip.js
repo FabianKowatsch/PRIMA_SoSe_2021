@@ -6,9 +6,9 @@ var SpaceInvaders;
         constructor() {
             super("SpaceShip");
             let scale = new f.Vector3(1, 1, 0);
-            let transform = new f.ComponentTransform();
-            transform.mtxLocal.scale(scale);
-            this.addComponent(transform);
+            let cmpTransform = new f.ComponentTransform();
+            cmpTransform.mtxLocal.scale(scale);
+            this.addComponent(cmpTransform);
             this.addComponent(new f.ComponentMaterial(SpaceInvaders.greenMaterial));
             this.addComponent(new f.ComponentMesh(SpaceInvaders.spaceShipMesh));
         }

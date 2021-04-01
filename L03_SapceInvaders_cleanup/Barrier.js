@@ -7,10 +7,10 @@ var SpaceInvaders;
             super("Barrier" + _x + "/" + _y);
             let translate = new f.Vector3(_x, _y, 0);
             let scale = new f.Vector3(1, 1, 0);
-            let transform = new f.ComponentTransform();
-            transform.mtxLocal.translate(translate);
-            transform.mtxLocal.scale(scale);
-            this.addComponent(transform);
+            let cmpTransform = new f.ComponentTransform();
+            cmpTransform.mtxLocal.translate(translate);
+            cmpTransform.mtxLocal.scale(scale);
+            this.addComponent(cmpTransform);
             for (let i = 0; i < 5; i++) {
                 for (let j = 0; j < 9; j++) {
                     if ((i > 2 || i + j > 4) && i + j < 11) {

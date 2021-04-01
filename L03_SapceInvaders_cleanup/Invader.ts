@@ -5,10 +5,10 @@ namespace SpaceInvaders {
       super("Invader" + _x + "/" + _y);
       let translate: f.Vector3 = new f.Vector3(_x, _y, 0);
       let scale: f.Vector3 = new f.Vector3(0.5, 0.5, 0);
-      let transform: f.ComponentTransform = new f.ComponentTransform();
-      transform.mtxLocal.translate(translate);
-      transform.mtxLocal.scale(scale);
-      this.addComponent(transform);
+      let cmpTransform: f.ComponentTransform = new f.ComponentTransform();
+      cmpTransform.mtxLocal.translate(translate);
+      cmpTransform.mtxLocal.scale(scale);
+      this.addComponent(cmpTransform);
       this.addComponent(new f.ComponentMaterial(whiteMaterial));
       this.addComponent(new f.ComponentMesh(enemyMesh));
     }
