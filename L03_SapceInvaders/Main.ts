@@ -8,13 +8,14 @@ namespace SpaceInvaders {
   const barrierAmount: number = 5;
   const startPosX: number = -(enemiesPerRow - 1) / 2;
   const startPosY: number = 9;
-  const maxHeight: number = 12;
+  const maxHeight: number = 11;
   let fireTimeout: boolean = false;
-  const playerProjectileSpeed: number = 10;
 
   const root: f.Node = new f.Node("Root");
   const invaderNode: f.Node = new f.Node("Invaders");
   const barrierNode: f.Node = new f.Node("Barriers");
+  const projectileNode: f.Node = new f.Node("Projectiles");
+  root.appendChild(projectileNode);
   createEnemies();
   createMothership();
   createSpaceShip();
@@ -38,7 +39,6 @@ namespace SpaceInvaders {
   }
 
   function update(_event: Event): void {
-    viewport.draw();
     if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
       spaceShip.mtxLocal.translateX(
         -(movementSpeed * f.Loop.timeFrameReal) / 1000
@@ -50,14 +50,15 @@ namespace SpaceInvaders {
       );
     }
 
-    root.getChildrenByName("Projectile").forEach((projectile) => {
-      projectile.mtxLocal.translateY(
-        (playerProjectileSpeed * f.Loop.timeFrameReal) / 1000
-      );
-      if (projectile.mtxLocal.get()[13] >= maxHeight) {
-        projectile.activate(false);
+    projectileNode.getChildren().forEach((element) => {
+      let projectile: Projectile = element as Projectile;
+      projectile.move();
+      if (projectile.mtxLocal.translation.y >= maxHeight) {
+        projectileNode.removeChild(projectile);
       }
     });
+    checkProjectileCollision();
+    viewport.draw();
   }
   function hndKeyDown(_event: KeyboardEvent): void {
     if (_event.code === "Space") fireBullet();
@@ -68,7 +69,7 @@ namespace SpaceInvaders {
     let counterEnemies: number = 0;
     for (let i: number = 0; i < enemiesPerRow * rowAmount; i++) {
       let invader: Invader = new Invader(
-        new f.Vector2(counterEnemies, -counterRow)
+        new f.Vector2(startPosX + counterEnemies, startPosY - counterRow)
       );
       invaderNode.appendChild(invader);
 
@@ -79,10 +80,6 @@ namespace SpaceInvaders {
         counterEnemies++;
       }
     }
-    let translate: f.Vector3 = new f.Vector3(startPosX, startPosY, 0);
-    let transform: f.ComponentTransform = new f.ComponentTransform();
-    transform.mtxLocal.translate(translate);
-    invaderNode.addComponent(transform);
     root.appendChild(invaderNode);
   }
 
@@ -108,14 +105,24 @@ namespace SpaceInvaders {
   function fireBullet(): void {
     if (fireTimeout === true) return;
     let spaceShipPos: f.Vector2 = new f.Vector2(
-      spaceShip.mtxLocal.get()[12],
+      spaceShip.mtxLocal.translation.x,
       1
     );
     let bullet: Projectile = new Projectile(spaceShipPos);
-    root.addChild(bullet);
+    projectileNode.addChild(bullet);
     fireTimeout = true;
     setTimeout(() => {
       fireTimeout = false;
     }, 1000);
+  }
+  function checkProjectileCollision(): void {
+    for (let projectile of projectileNode.getChildren() as Projectile[]) {
+      for (let invader of invaderNode.getChildren() as Invader[]) {
+        if (projectile.checkCollision(invader)) {
+          projectileNode.removeChild(projectile);
+          invaderNode.removeChild(invader);
+        }
+      }
+    }
   }
 }

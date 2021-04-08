@@ -5,7 +5,7 @@ var SpaceInvaders;
     class Mothership extends SpaceInvaders.QuadNode {
         constructor(_pos) {
             let _scale = new f.Vector2(1, 0.5);
-            super("Invader" + _pos.x + "/" + _pos.y, _pos, _scale);
+            super("Mothership", _pos, _scale, "mothership");
         }
     }
     SpaceInvaders.Mothership = Mothership;
