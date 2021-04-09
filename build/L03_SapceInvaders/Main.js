@@ -10,9 +10,10 @@ var SpaceInvaders;
     const startPosX = -(enemiesPerRow - 1) / 2;
     const startPosY = 9;
     const maxHeight = 11;
+    const startInterval = 5000;
     let fireTimeout = false;
     const root = new f.Node("Root");
-    const invaderNode = new f.Node("Invaders");
+    const invaderNode = new SpaceInvaders.InvaderNode(new f.Vector2(0, 0));
     const barrierNode = new f.Node("Barriers");
     const projectileNode = new f.Node("Projectiles");
     root.appendChild(projectileNode);
@@ -34,6 +35,7 @@ var SpaceInvaders;
         viewport.draw();
         f.Loop.start(f.LOOP_MODE.TIME_REAL, frameRate);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        moveInvaderNode();
     }
     function update(_event) {
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
@@ -98,7 +100,7 @@ var SpaceInvaders;
         fireTimeout = true;
         setTimeout(() => {
             fireTimeout = false;
-        }, 1000);
+        }, 500);
     }
     function checkProjectileCollision() {
         for (let projectile of projectileNode.getChildren()) {
@@ -109,6 +111,13 @@ var SpaceInvaders;
                 }
             }
         }
+    }
+    function moveInvaderNode() {
+        let interval = startInterval;
+        setInterval(() => {
+            invaderNode.move(new f.Vector2(-0.1, -0.1));
+            interval -= 100;
+        }, interval);
     }
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=Main.js.map

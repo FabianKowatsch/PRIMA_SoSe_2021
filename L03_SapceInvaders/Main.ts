@@ -9,10 +9,11 @@ namespace SpaceInvaders {
   const startPosX: number = -(enemiesPerRow - 1) / 2;
   const startPosY: number = 9;
   const maxHeight: number = 11;
+  const startInterval: number = 5000;
   let fireTimeout: boolean = false;
 
   const root: f.Node = new f.Node("Root");
-  const invaderNode: f.Node = new f.Node("Invaders");
+  const invaderNode: InvaderNode = new InvaderNode(new f.Vector2(0, 0));
   const barrierNode: f.Node = new f.Node("Barriers");
   const projectileNode: f.Node = new f.Node("Projectiles");
   root.appendChild(projectileNode);
@@ -36,6 +37,7 @@ namespace SpaceInvaders {
     viewport.draw();
     f.Loop.start(f.LOOP_MODE.TIME_REAL, frameRate);
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
+    moveInvaderNode();
   }
 
   function update(_event: Event): void {
@@ -113,7 +115,7 @@ namespace SpaceInvaders {
     fireTimeout = true;
     setTimeout(() => {
       fireTimeout = false;
-    }, 1000);
+    }, 500);
   }
   function checkProjectileCollision(): void {
     for (let projectile of projectileNode.getChildren() as Projectile[]) {
@@ -124,5 +126,12 @@ namespace SpaceInvaders {
         }
       }
     }
+  }
+  function moveInvaderNode(): void {
+    let interval: number = startInterval;
+    setInterval(() => {
+      invaderNode.move(new f.Vector2(-0.1, -0.1));
+      interval -= 100;
+    }, interval);
   }
 }
