@@ -7,11 +7,14 @@ var SpaceInvaders;
     const enemiesPerRow = 9;
     const rowAmount = 4;
     const barrierAmount = 5;
-    const startPosX = -(enemiesPerRow - 1) / 2;
+    const startPosX = -(enemiesPerRow - 1) / 2 - 0.5;
     const startPosY = 9;
     const maxHeight = 11;
-    const startInterval = 5000;
+    let interval = 3000;
     let fireTimeout = false;
+    let invaderMovementX = 0.2;
+    let invaderMovementY = 0;
+    let intervalCount = 0;
     const root = new f.Node("Root");
     const invaderNode = new SpaceInvaders.InvaderNode(new f.Vector2(0, 0));
     const barrierNode = new f.Node("Barriers");
@@ -113,11 +116,20 @@ var SpaceInvaders;
         }
     }
     function moveInvaderNode() {
-        let interval = startInterval;
-        setInterval(() => {
-            invaderNode.move(new f.Vector2(-0.1, -0.1));
+        if (intervalCount % 5 === 0 && intervalCount > 0) {
+            invaderMovementX *= -1;
+            invaderMovementY -= 0.1;
+        }
+        else {
+            invaderMovementY = 0;
+        }
+        invaderNode.move(new f.Vector2(invaderMovementX, invaderMovementY));
+        if (interval > 100) {
             interval -= 100;
-        }, interval);
+        }
+        intervalCount++;
+        console.log(interval);
+        setTimeout(moveInvaderNode, interval);
     }
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=Main.js.map

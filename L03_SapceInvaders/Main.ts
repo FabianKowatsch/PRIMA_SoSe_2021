@@ -6,11 +6,14 @@ namespace SpaceInvaders {
   const enemiesPerRow: number = 9;
   const rowAmount: number = 4;
   const barrierAmount: number = 5;
-  const startPosX: number = -(enemiesPerRow - 1) / 2;
+  const startPosX: number = -(enemiesPerRow - 1) / 2 - 0.5;
   const startPosY: number = 9;
   const maxHeight: number = 11;
-  const startInterval: number = 5000;
+  let interval: number = 3000;
   let fireTimeout: boolean = false;
+  let invaderMovementX: number = 0.2;
+  let invaderMovementY: number = 0;
+  let intervalCount: number = 0;
 
   const root: f.Node = new f.Node("Root");
   const invaderNode: InvaderNode = new InvaderNode(new f.Vector2(0, 0));
@@ -128,10 +131,18 @@ namespace SpaceInvaders {
     }
   }
   function moveInvaderNode(): void {
-    let interval: number = startInterval;
-    setInterval(() => {
-      invaderNode.move(new f.Vector2(-0.1, -0.1));
+    if (intervalCount % 5 === 0 && intervalCount > 0) {
+      invaderMovementX *= -1;
+      invaderMovementY -= 0.1;
+    } else {
+      invaderMovementY = 0;
+    }
+    invaderNode.move(new f.Vector2(invaderMovementX, invaderMovementY));
+    if (interval > 100) {
       interval -= 100;
-    }, interval);
+    }
+    intervalCount++;
+    console.log(interval);
+    setTimeout(moveInvaderNode, interval);
   }
 }
