@@ -8,6 +8,8 @@ var SpaceInvaders;
             super("Projectile", _pos, scale);
             this.getComponent(f.ComponentMaterial).clrPrimary = new f.Color(1, 1, 0, 1);
             this.velocity = 15;
+            this.cmpAudio = new f.ComponentAudio(new f.Audio("./Assets/shoot.wav"));
+            this.addComponent(this.cmpAudio);
         }
         move() {
             this.mtxLocal.translateY((this.velocity * f.Loop.timeFrameReal) / 1000);

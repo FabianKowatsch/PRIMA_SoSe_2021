@@ -9,7 +9,10 @@ namespace SpaceInvaders {
   const startPosX: number = -(enemiesPerRow - 1) / 2 - 0.5;
   const startPosY: number = 9;
   const maxHeight: number = 11;
-  let interval: number = 3000;
+
+  let state: GameState = GameState.menu;
+  const defaultInterval: number = 1000;
+  let interval: number = defaultInterval;
   let fireTimeout: boolean = false;
   let invaderMovementX: number = 0.2;
   let invaderMovementY: number = 0;
@@ -38,51 +41,56 @@ namespace SpaceInvaders {
     console.log(root);
     viewport.initialize("Viewport", root, cmpCamera, canvas);
     viewport.draw();
+    state = GameState.running;
     f.Loop.start(f.LOOP_MODE.TIME_REAL, frameRate);
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     moveInvaderNode();
   }
 
   function update(_event: Event): void {
-    if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
-      spaceShip.mtxLocal.translateX(
-        -(movementSpeed * f.Loop.timeFrameReal) / 1000
-      );
-    }
-    if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D])) {
-      spaceShip.mtxLocal.translateX(
-        (movementSpeed * f.Loop.timeFrameReal) / 1000
-      );
-    }
-
-    projectileNode.getChildren().forEach((element) => {
-      let projectile: Projectile = element as Projectile;
-      projectile.move();
-      if (projectile.mtxLocal.translation.y >= maxHeight) {
-        projectileNode.removeChild(projectile);
+    if (state === GameState.running) {
+      if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
+        spaceShip.mtxLocal.translateX(
+          -(movementSpeed * f.Loop.timeFrameReal) / 1000
+        );
       }
-    });
-    checkProjectileCollision();
+      if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D])) {
+        spaceShip.mtxLocal.translateX(
+          (movementSpeed * f.Loop.timeFrameReal) / 1000
+        );
+      }
+
+      projectileNode.getChildren().forEach((element) => {
+        let projectile: Projectile = element as Projectile;
+        projectile.move();
+        if (projectile.mtxLocal.translation.y >= maxHeight) {
+          projectileNode.removeChild(projectile);
+        }
+      });
+      checkProjectileCollision();
+      checkForStateUpdate();
+    }
     viewport.draw();
   }
   function hndKeyDown(_event: KeyboardEvent): void {
-    if (_event.code === "Space") fireBullet();
+    if (_event.code === f.KEYBOARD_CODE.SPACE) fireBullet();
+    else if (_event.code === f.KEYBOARD_CODE.R) reset();
   }
 
   function createEnemies(): void {
     let counterRow: number = 0;
-    let counterEnemies: number = 0;
+    let counterColumns: number = 0;
     for (let i: number = 0; i < enemiesPerRow * rowAmount; i++) {
       let invader: Invader = new Invader(
-        new f.Vector2(startPosX + counterEnemies, startPosY - counterRow)
+        new f.Vector2(startPosX + counterColumns, startPosY - counterRow)
       );
       invaderNode.appendChild(invader);
 
-      if (counterEnemies === enemiesPerRow - 1) {
+      if (counterColumns === enemiesPerRow - 1) {
         counterRow++;
-        counterEnemies = 0;
+        counterColumns = 0;
       } else {
-        counterEnemies++;
+        counterColumns++;
       }
     }
     root.appendChild(invaderNode);
@@ -115,6 +123,7 @@ namespace SpaceInvaders {
     );
     let bullet: Projectile = new Projectile(spaceShipPos);
     projectileNode.addChild(bullet);
+    bullet.cmpAudio.play(true);
     fireTimeout = true;
     setTimeout(() => {
       fireTimeout = false;
@@ -138,11 +147,38 @@ namespace SpaceInvaders {
       invaderMovementY = 0;
     }
     invaderNode.move(new f.Vector2(invaderMovementX, invaderMovementY));
-    if (interval > 100) {
+    if (interval > 200) {
       interval -= 100;
     }
     intervalCount++;
-    console.log(interval);
-    setTimeout(moveInvaderNode, interval);
+
+    if (state === GameState.running) setTimeout(moveInvaderNode, interval);
+  }
+
+  function checkForStateUpdate(): void {
+    for (let invader of invaderNode.getChildren() as Invader[]) {
+      if (
+        invader.mtxLocal.translation.y + invaderNode.mtxLocal.translation.y <=
+        1
+      ) {
+        state = GameState.over;
+      }
+    }
+
+    if (invaderNode.getChildren().length === 0) state = GameState.over;
+  }
+
+  function reset(): void {
+    console.log("reset");
+    invaderNode.removeAllChildren();
+    invaderNode.mtxLocal.translateX(-invaderNode.mtxLocal.translation.x);
+    invaderNode.mtxLocal.translateY(-invaderNode.mtxLocal.translation.y);
+    createEnemies();
+    interval = defaultInterval;
+    invaderMovementX = 0.2;
+    invaderMovementY = 0;
+    intervalCount = 0;
+    if (state === GameState.over) moveInvaderNode();
+    state = GameState.running;
   }
 }

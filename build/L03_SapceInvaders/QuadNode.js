@@ -33,10 +33,22 @@ var SpaceInvaders;
                 this.rect.position.x = this.mtxLocal.translation.x - this.rect.size.x / 2;
                 this.rect.position.y = this.mtxLocal.translation.y - this.rect.size.y / 2;
             }
+            updateRectPosition() {
+                if (this.getParent() == null)
+                    return;
+                this.rect.position.x =
+                    this.mtxLocal.translation.x +
+                        this.getParent().mtxLocal.translation.x -
+                        this.rect.size.x / 2;
+                this.rect.position.y =
+                    this.mtxLocal.translation.y +
+                        this.getParent().mtxLocal.translation.y -
+                        this.rect.size.y / 2;
+            }
         }
         QuadNode.mesh = new f.MeshQuad("Quad");
         QuadNode.material = new f.Material("Material", f.ShaderUniColor, new f.CoatColored());
-        QuadNode.textureInvader = new f.TextureImage("./Assets/invader.png");
+        QuadNode.textureInvader = new f.TextureImage("./Assets/Invader.png");
         QuadNode.materialInvader = new f.Material("Invader", f.ShaderTexture, new f.CoatTextured(f.Color.CSS("White"), QuadNode.textureInvader));
         QuadNode.textureMothership = new f.TextureImage("./Assets/mothership.png");
         QuadNode.materialMothership = new f.Material("Invader", f.ShaderTexture, new f.CoatTextured(f.Color.CSS("White"), QuadNode.textureMothership));
