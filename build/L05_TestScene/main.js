@@ -1,6 +1,6 @@
 "use strict";
-var L04_FudgeBall;
-(function (L04_FudgeBall) {
+var L05_TestScene;
+(function (L05_TestScene) {
     var f = FudgeCore;
     window.addEventListener("load", init);
     let graphId = "Graph|2021-04-27T14:37:53.620Z|93013";
@@ -69,5 +69,5 @@ var L04_FudgeBall;
     //   function settingUpTrigger(): void {}
     //   function resetBall(_event: f.EventPhysics): void {}
     //   function settingUpAJoint(): void {}
-})(L04_FudgeBall || (L04_FudgeBall = {}));
+})(L05_TestScene || (L05_TestScene = {}));
 //# sourceMappingURL=main.js.map

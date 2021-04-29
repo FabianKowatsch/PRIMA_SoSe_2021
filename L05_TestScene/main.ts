@@ -1,4 +1,4 @@
-namespace L04_FudgeBall {
+namespace L05_TestScene {
   import f = FudgeCore;
   window.addEventListener("load", init);
   let graphId: string = "Graph|2021-04-27T14:37:53.620Z|93013";
