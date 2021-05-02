@@ -2,10 +2,12 @@ namespace L05_TestScene {
   import f = FudgeCore;
   let graphId: string = "Graph|2021-04-27T14:37:53.620Z|93013";
   let viewport: f.Viewport;
-  let ball: f.Node;
   let cmpCamera: f.ComponentCamera;
   let player: f.Node = new f.Node("Avatar");
   let root: f.Graph = new f.Graph("root");
+  let camBufferX: number = 0;
+  let camBufferY: number = 0;
+  const camSpeed: number = 0.2;
 
   window.addEventListener("load", init);
 
@@ -15,12 +17,11 @@ namespace L05_TestScene {
     root = <f.Graph>resource;
 
     const app: HTMLCanvasElement = document.querySelector("canvas");
-    ball = root.getChildrenByName("ball")[0];
 
     cmpCamera = new f.ComponentCamera();
     cmpCamera.clrBackground = f.Color.CSS("GREY");
-    cmpCamera.mtxPivot.translate(new f.Vector3(0, 0, -20));
-    cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
+    cmpCamera.mtxPivot.translate(new f.Vector3(0, 1, 0));
+    //cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
     initPhysics();
     createAvatar();
     createRigidbodies();
@@ -30,13 +31,13 @@ namespace L05_TestScene {
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(); //Stard the game loop
     console.log(root);
+    app.addEventListener("mousemove", hndMouseMovement);
   }
 
   function update(): void {
     f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
 
-    cmpCamera.mtxPivot.lookAt(ball.mtxLocal.translation);
-
+    updateCamera(camBufferX, camBufferY);
     viewport.draw();
   }
   function initPhysics(): void {
@@ -66,5 +67,18 @@ namespace L05_TestScene {
       let cmpRigid: f.ComponentRigidbody = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
       node.addComponent(cmpRigid);
     }
+  }
+
+  function hndMouseMovement(_event: MouseEvent): void {
+    camBufferX += _event.movementX;
+    camBufferY += _event.movementY;
+  }
+
+  function updateCamera(_x: number, _y: number): void {
+    cmpCamera.mtxPivot.rotateY(-_x * camSpeed, true);
+    cmpCamera.mtxPivot.rotateX(_y * camSpeed);
+
+    camBufferX = 0;
+    camBufferY = 0;
   }
 }

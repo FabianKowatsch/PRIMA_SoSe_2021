@@ -4,21 +4,22 @@ var L05_TestScene;
     var f = FudgeCore;
     let graphId = "Graph|2021-04-27T14:37:53.620Z|93013";
     let viewport;
-    let ball;
     let cmpCamera;
     let player = new f.Node("Avatar");
     let root = new f.Graph("root");
+    let camBufferX = 0;
+    let camBufferY = 0;
+    const camSpeed = 0.2;
     window.addEventListener("load", init);
     async function init(_event) {
         await f.Project.loadResourcesFromHTML();
         let resource = f.Project.resources[graphId];
         root = resource;
         const app = document.querySelector("canvas");
-        ball = root.getChildrenByName("ball")[0];
         cmpCamera = new f.ComponentCamera();
         cmpCamera.clrBackground = f.Color.CSS("GREY");
-        cmpCamera.mtxPivot.translate(new f.Vector3(0, 0, -20));
-        cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
+        cmpCamera.mtxPivot.translate(new f.Vector3(0, 1, 0));
+        //cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
         initPhysics();
         createAvatar();
         createRigidbodies();
@@ -28,10 +29,11 @@ var L05_TestScene;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
         console.log(root);
+        app.addEventListener("mousemove", hndMouseMovement);
     }
     function update() {
         f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
-        cmpCamera.mtxPivot.lookAt(ball.mtxLocal.translation);
+        updateCamera(camBufferX, camBufferY);
         viewport.draw();
     }
     function initPhysics() {
@@ -60,6 +62,16 @@ var L05_TestScene;
             let cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigid);
         }
+    }
+    function hndMouseMovement(_event) {
+        camBufferX += _event.movementX;
+        camBufferY += _event.movementY;
+    }
+    function updateCamera(_x, _y) {
+        cmpCamera.mtxPivot.rotateY(-_x * camSpeed, true);
+        cmpCamera.mtxPivot.rotateX(_y * camSpeed);
+        camBufferX = 0;
+        camBufferY = 0;
     }
 })(L05_TestScene || (L05_TestScene = {}));
 //# sourceMappingURL=main.js.map
