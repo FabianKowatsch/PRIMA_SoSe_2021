@@ -229,7 +229,7 @@
                           "local": {
                             "translation": "[0, -0.5, 0]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[20, 1, 20]"
+                            "scaling": "[50, 1, 50]"
                           },
                           "Component": {
                             "active": true

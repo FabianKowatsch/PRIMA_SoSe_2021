@@ -87,7 +87,7 @@ namespace L04_FudgeBall {
       }
     });
 
-    f.Physics.start(hierarchy);
+    f.Physics.adjustTransforms(hierarchy, true);
 
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(); //Stard the game loop

@@ -142,8 +142,7 @@ var SpaceInvaders;
     }
     function checkForStateUpdate() {
         for (let invader of invaderNode.getChildren()) {
-            if (invader.mtxLocal.translation.y + invaderNode.mtxLocal.translation.y <=
-                1) {
+            if (invader.mtxLocal.translation.y + invaderNode.mtxLocal.translation.y <= 1) {
                 state = SpaceInvaders.GameState.over;
             }
         }

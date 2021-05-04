@@ -61,7 +61,7 @@ namespace L05_TestScene {
 
     // Implementing kicking mechanic
 
-    f.Physics.start(graph);
+    f.Physics.adjustTransforms(graph, true);
 
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(); //Stard the game loop

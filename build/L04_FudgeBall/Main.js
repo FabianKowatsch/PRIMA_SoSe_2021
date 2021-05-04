@@ -67,7 +67,7 @@ var L04_FudgeBall;
                 ballBody.applyImpulseAtPoint(new f.Vector3((playerForward.x * kickStrength) / distance.magnitude, (playerForward.y * kickStrength) / distance.magnitude, (playerForward.z * kickStrength) / distance.magnitude), player.mtxWorld.translation);
             }
         });
-        f.Physics.start(hierarchy);
+        f.Physics.adjustTransforms(hierarchy, true);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
     }

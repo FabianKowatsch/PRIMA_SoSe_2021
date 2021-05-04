@@ -50,14 +50,10 @@ namespace SpaceInvaders {
   function update(_event: Event): void {
     if (state === GameState.running) {
       if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.A])) {
-        spaceShip.mtxLocal.translateX(
-          -(movementSpeed * f.Loop.timeFrameReal) / 1000
-        );
+        spaceShip.mtxLocal.translateX(-(movementSpeed * f.Loop.timeFrameReal) / 1000);
       }
       if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.D])) {
-        spaceShip.mtxLocal.translateX(
-          (movementSpeed * f.Loop.timeFrameReal) / 1000
-        );
+        spaceShip.mtxLocal.translateX((movementSpeed * f.Loop.timeFrameReal) / 1000);
       }
 
       projectileNode.getChildren().forEach((element) => {
@@ -81,9 +77,7 @@ namespace SpaceInvaders {
     let counterRow: number = 0;
     let counterColumns: number = 0;
     for (let i: number = 0; i < enemiesPerRow * rowAmount; i++) {
-      let invader: Invader = new Invader(
-        new f.Vector2(startPosX + counterColumns, startPosY - counterRow)
-      );
+      let invader: Invader = new Invader(new f.Vector2(startPosX + counterColumns, startPosY - counterRow));
       invaderNode.appendChild(invader);
 
       if (counterColumns === enemiesPerRow - 1) {
@@ -117,10 +111,7 @@ namespace SpaceInvaders {
   }
   function fireBullet(): void {
     if (fireTimeout === true) return;
-    let spaceShipPos: f.Vector2 = new f.Vector2(
-      spaceShip.mtxLocal.translation.x,
-      1
-    );
+    let spaceShipPos: f.Vector2 = new f.Vector2(spaceShip.mtxLocal.translation.x, 1);
     let bullet: Projectile = new Projectile(spaceShipPos);
     projectileNode.addChild(bullet);
     bullet.cmpAudio.play(true);
@@ -157,10 +148,7 @@ namespace SpaceInvaders {
 
   function checkForStateUpdate(): void {
     for (let invader of invaderNode.getChildren() as Invader[]) {
-      if (
-        invader.mtxLocal.translation.y + invaderNode.mtxLocal.translation.y <=
-        1
-      ) {
+      if (invader.mtxLocal.translation.y + invaderNode.mtxLocal.translation.y <= 1) {
         state = GameState.over;
       }
     }

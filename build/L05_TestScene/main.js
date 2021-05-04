@@ -48,7 +48,7 @@ var L05_TestScene;
         // document.addEventListener("keyup", handler_Key_Released);
         //Ball Resetting on enter trigger
         // Implementing kicking mechanic
-        f.Physics.start(graph);
+        f.Physics.adjustTransforms(graph, true);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
         console.log(ball);
