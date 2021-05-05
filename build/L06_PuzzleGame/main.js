@@ -10,8 +10,7 @@ var L06_PuzzleGame;
     let root = new f.Graph("root");
     let camBufferX = 0;
     let camBufferY = 0;
-    const camSpeed = 0.2;
-    const movementSpeed = 5;
+    const camSpeed = 0.15;
     let isLocked = false;
     let forwardMovement = 0;
     let sideMovement = 0;
@@ -42,7 +41,8 @@ var L06_PuzzleGame;
         f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
         checkKeyboardInputs();
         updateCamera(camBufferX, camBufferY);
-        player_Movement(f.Loop.timeFrameReal / 1000);
+        avatar.checkIfGrounded();
+        avatar.move(forwardMovement, sideMovement);
         viewport.draw();
     }
     function initPhysics() {
@@ -81,7 +81,7 @@ var L06_PuzzleGame;
     }
     function checkKeyboardInputs() {
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE])) {
-            // avatar.mtxLocal.translateX((movementSpeed * f.Loop.timeFrameReal) / 1000);
+            avatar.jump();
         }
     }
     function hndKeyDown(_event) {
@@ -97,6 +97,9 @@ var L06_PuzzleGame;
         if (_event.code == f.KEYBOARD_CODE.D) {
             sideMovement = 1;
         }
+        if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
+            avatar.sprint();
+        }
     }
     function hndKeyRelease(_event) {
         if (_event.code == f.KEYBOARD_CODE.W) {
@@ -110,6 +113,9 @@ var L06_PuzzleGame;
         }
         if (_event.code == f.KEYBOARD_CODE.D) {
             sideMovement = 0;
+        }
+        if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
+            avatar.walk();
         }
     }
     function onPointerDown(_event) {
@@ -125,18 +131,6 @@ var L06_PuzzleGame;
         else {
             isLocked = true;
         }
-    }
-    function player_Movement(_deltaTime) {
-        let playerForward = avatar.camNode.mtxLocal.getX();
-        let playerSideward = avatar.camNode.mtxLocal.getZ();
-        playerSideward.normalize();
-        playerForward.normalize();
-        let playerBody = avatar.cmpRigid;
-        let movementVel = new f.Vector3();
-        movementVel.z = (playerForward.z * forwardMovement + playerSideward.z * sideMovement) * movementSpeed;
-        movementVel.y = playerBody.getVelocity().y;
-        movementVel.x = (playerForward.x * forwardMovement + playerSideward.x * sideMovement) * movementSpeed;
-        playerBody.setVelocity(movementVel);
     }
 })(L06_PuzzleGame || (L06_PuzzleGame = {}));
 //# sourceMappingURL=main.js.map

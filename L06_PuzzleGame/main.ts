@@ -9,8 +9,7 @@ namespace L06_PuzzleGame {
   let root: f.Graph = new f.Graph("root");
   let camBufferX: number = 0;
   let camBufferY: number = 0;
-  const camSpeed: number = 0.2;
-  const movementSpeed: number = 5;
+  const camSpeed: number = 0.15;
   let isLocked: boolean = false;
   let forwardMovement: number = 0;
   let sideMovement: number = 0;
@@ -45,7 +44,8 @@ namespace L06_PuzzleGame {
     f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
     checkKeyboardInputs();
     updateCamera(camBufferX, camBufferY);
-    player_Movement(f.Loop.timeFrameReal / 1000);
+    avatar.checkIfGrounded();
+    avatar.move(forwardMovement, sideMovement);
     viewport.draw();
   }
   function initPhysics(): void {
@@ -88,7 +88,7 @@ namespace L06_PuzzleGame {
 
   function checkKeyboardInputs(): void {
     if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE])) {
-      // avatar.mtxLocal.translateX((movementSpeed * f.Loop.timeFrameReal) / 1000);
+      avatar.jump();
     }
   }
 
@@ -105,6 +105,9 @@ namespace L06_PuzzleGame {
     if (_event.code == f.KEYBOARD_CODE.D) {
       sideMovement = 1;
     }
+    if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
+      avatar.sprint();
+    }
   }
 
   function hndKeyRelease(_event: KeyboardEvent): void {
@@ -119,6 +122,9 @@ namespace L06_PuzzleGame {
     }
     if (_event.code == f.KEYBOARD_CODE.D) {
       sideMovement = 0;
+    }
+    if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
+      avatar.walk();
     }
   }
 
@@ -135,18 +141,5 @@ namespace L06_PuzzleGame {
     } else {
       isLocked = true;
     }
-  }
-
-  function player_Movement(_deltaTime: number): void {
-    let playerForward: f.Vector3 = avatar.camNode.mtxLocal.getX();
-    let playerSideward: f.Vector3 = avatar.camNode.mtxLocal.getZ();
-    playerSideward.normalize();
-    playerForward.normalize();
-    let playerBody: f.ComponentRigidbody = avatar.cmpRigid;
-    let movementVel: f.Vector3 = new f.Vector3();
-    movementVel.z = (playerForward.z * forwardMovement + playerSideward.z * sideMovement) * movementSpeed;
-    movementVel.y = playerBody.getVelocity().y;
-    movementVel.x = (playerForward.x * forwardMovement + playerSideward.x * sideMovement) * movementSpeed;
-    playerBody.setVelocity(movementVel);
   }
 }
