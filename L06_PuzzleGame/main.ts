@@ -49,6 +49,7 @@ namespace L06_PuzzleGame {
     updateCamera(camBufferX, camBufferY);
     avatar.checkIfGrounded();
     avatar.move(forwardMovement, sideMovement);
+    avatar.tryGrabLastNode();
     viewport.draw();
   }
   function initPhysics(): void {
@@ -82,7 +83,7 @@ namespace L06_PuzzleGame {
       node.addComponent(cmpRigid);
     }
     let ball: f.Node = root.getChildrenByName("ball")[0];
-    cmpRigid = new f.ComponentRigidbody(1, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+    cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
     ball.addComponent(cmpRigid);
   }
 
@@ -109,7 +110,9 @@ namespace L06_PuzzleGame {
   function updateCamera(_x: number, _y: number): void {
     //avatar.mtxLocal.rotateY(-_x * camSpeed, true);
     avatar.camNode.mtxLocal.rotateY(_x * camSpeed, true);
+
     avatar.camNode.mtxLocal.rotateZ(_y * camSpeed);
+
     camBufferX = 0;
     camBufferY = 0;
   }

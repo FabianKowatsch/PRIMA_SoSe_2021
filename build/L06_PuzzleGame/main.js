@@ -46,6 +46,7 @@ var L06_PuzzleGame;
         updateCamera(camBufferX, camBufferY);
         avatar.checkIfGrounded();
         avatar.move(forwardMovement, sideMovement);
+        avatar.tryGrabLastNode();
         viewport.draw();
     }
     function initPhysics() {
@@ -78,7 +79,7 @@ var L06_PuzzleGame;
             node.addComponent(cmpRigid);
         }
         let ball = root.getChildrenByName("ball")[0];
-        cmpRigid = new f.ComponentRigidbody(1, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+        cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
         ball.addComponent(cmpRigid);
     }
     function createProps() {

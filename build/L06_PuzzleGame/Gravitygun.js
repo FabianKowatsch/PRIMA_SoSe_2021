@@ -38,4 +38,4 @@ var L06_PuzzleGame;
     })();
     L06_PuzzleGame.GravityGun = GravityGun;
 })(L06_PuzzleGame || (L06_PuzzleGame = {}));
-//# sourceMappingURL=Gravitygun.js.map
+//# sourceMappingURL=GravityGun.js.map

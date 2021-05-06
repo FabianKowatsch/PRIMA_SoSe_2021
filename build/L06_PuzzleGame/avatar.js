@@ -11,6 +11,9 @@ var L06_PuzzleGame;
             this.isGrounded = false;
             this.jumpForce = 120;
             this.weight = 75;
+            this.activeProp = null;
+            this.hasProp = false;
+            this.propRigid = null;
             //Transform
             let cmpTransform = new f.ComponentTransform();
             cmpTransform.mtxLocal.scale(new f.Vector3(1, 1, 1));
@@ -70,36 +73,76 @@ var L06_PuzzleGame;
                 this.movementSpeed = this.defaultSpeed;
         }
         shootPull() {
-            let hitInfo;
-            let direction = this.camNode.mtxLocal.getX();
-            direction.normalize();
-            let origin = this.cmpRigid.getPosition();
-            origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
-            hitInfo = f.Physics.raycast(origin, direction, 10);
-            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
-                hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
-            }
-            else {
-                return;
+            if (this.hasProp == false) {
+                let direction = this.camNode.mtxLocal.getX();
+                direction.normalize();
+                let hitInfo = this.avatarHitInfo(10);
+                if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+                    hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
+                    this.activeProp = hitInfo.rigidbodyComponent.getContainer();
+                }
             }
         }
         shootPush() {
-            let hitInfo;
+            let direction = this.camNode.mtxLocal.getX();
+            direction.normalize();
+            if (!this.hasProp) {
+                let hitInfo = this.avatarHitInfo(10);
+                if (hitInfo.hit) {
+                    if (hitInfo.rigidbodyComponent.physicsType != 1) {
+                        hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
+                    }
+                    else {
+                        console.log(hitInfo.rigidbodyComponent.physicsType);
+                    }
+                }
+            }
+            else {
+                this.letFall(true);
+                this.propRigid.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
+                this.propRigid = null;
+            }
+        }
+        tryGrabLastNode() {
+            if (this.activeProp == null || this.hasProp == true)
+                return;
+            let hitInfo = this.avatarHitInfo(2);
+            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1 && hitInfo.rigidbodyComponent.getContainer() == this.activeProp) {
+                this.pickUp(this.activeProp);
+                this.hasProp = true;
+            }
+        }
+        pickUp(_node) {
+            this.propRigid = _node.getComponent(f.ComponentRigidbody);
+            _node.removeComponent(this.propRigid);
+            this.camNode.addChild(_node);
+            _node.mtxLocal.set(f.Matrix4x4.TRANSLATION(new f.Vector3(3, 0, 0)));
+            // _node.getComponent(f.ComponentRigidbody).collisionGroup = f.PHYSICS_GROUP.DEFAULT;
+        }
+        letFall(_shooting = false) {
+            if (this.hasProp) {
+                this.propRigid.setAngularVelocity(f.Vector3.ZERO());
+                this.propRigid.setVelocity(f.Vector3.ZERO());
+                let direction = this.camNode.mtxLocal.getX();
+                direction.normalize();
+                let origin = this.cmpRigid.getPosition();
+                origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
+                this.propRigid.setPosition(origin);
+                this.activeProp.addComponent(this.propRigid);
+                this.getParent().addChild(this.activeProp);
+                this.activeProp = null;
+                if (!_shooting) {
+                    this.propRigid = null;
+                }
+                this.hasProp = false;
+            }
+        }
+        avatarHitInfo(_distance) {
             let direction = this.camNode.mtxLocal.getX();
             direction.normalize();
             let origin = this.cmpRigid.getPosition();
             origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
-            hitInfo = f.Physics.raycast(origin, direction, 10);
-            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
-                hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
-            }
-            else {
-                return;
-            }
-        }
-        tryPickUp(_node) {
-            this.camNode.addChild(_node);
-            _node.mtxLocal.set(f.Matrix4x4.TRANSLATION(f.Vector3.Z(1.5)));
+            return f.Physics.raycast(origin, direction, _distance);
         }
     }
     L06_PuzzleGame.Avatar = Avatar;
