@@ -6,6 +6,8 @@
     <!--Load FUDGE-->
     <script src="../OimoPhysics/OimoPhysics.js"></script>
     <script src="../FudgeCore/FudgeCore.js"></script>
+    <script src="../build/L06_PuzzleGame/Prop.js"></script>
+    <script src="../build/L06_PuzzleGame/Gravitygun.js"></script>
     <script src="../build/L06_PuzzleGame/Avatar.js"></script>
     <script src="../build/L06_PuzzleGame/main.js"></script>
     <!--Link stylesheet and internal resources-->
@@ -15,6 +17,9 @@
   </head>
   <body>
     <!--Canvas for FUDGE to render to-->
-    <canvas class="fullscreen"> </canvas>
+    <div class="wrapper">
+      <canvas class="fullscreen"></canvas>
+      <div class="crosshair"></div>
+    </div>
   </body>
 </html>

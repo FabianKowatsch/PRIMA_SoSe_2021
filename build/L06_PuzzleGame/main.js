@@ -8,9 +8,11 @@ var L06_PuzzleGame;
     let cmpCamera;
     let avatar;
     let root = new f.Graph("root");
+    let props;
+    const propAmount = 12;
     let camBufferX = 0;
     let camBufferY = 0;
-    const camSpeed = 0.15;
+    const camSpeed = -0.15;
     let isLocked = false;
     let forwardMovement = 0;
     let sideMovement = 0;
@@ -23,18 +25,19 @@ var L06_PuzzleGame;
         //cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
         initPhysics();
         createAvatar();
+        createProps();
         createRigidbodies();
         viewport = new f.Viewport();
         viewport.initialize("Viewport", root, cmpCamera, app);
-        f.Physics.adjustTransforms(root, false);
+        f.Physics.adjustTransforms(root, true);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
-        console.log(root);
+        //console.log(root);
         // Attach events to the document
         document.addEventListener("keydown", hndKeyDown);
         document.addEventListener("keyup", hndKeyRelease);
-        app.addEventListener("mousemove", hndMouseMovement);
-        app.addEventListener("mousedown", onPointerDown);
+        document.addEventListener("mousemove", hndMouseMovement);
+        document.addEventListener("mousedown", onPointerDown);
         document.addEventListener("pointerlockchange", pointerLockChange);
     }
     function update() {
@@ -50,7 +53,7 @@ var L06_PuzzleGame;
         f.Physics.world.setSolverIterations(1000);
         f.Physics.settings.defaultRestitution = 0.3;
         f.Physics.settings.defaultFriction = 0.8;
-        f.Physics.settings.debugDraw = true;
+        f.Physics.settings.debugDraw = false;
     }
     function createAvatar() {
         cmpCamera = new f.ComponentCamera();
@@ -59,29 +62,56 @@ var L06_PuzzleGame;
     }
     function createRigidbodies() {
         let level = root.getChildrenByName("level")[0];
+        let cmpRigid;
         for (let node of level.getChildren()) {
-            let cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+            switch (node.getComponent(f.ComponentMesh).mesh.name) {
+                case "meshCube":
+                    cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+                    break;
+                case "meshExtrusion":
+                    cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+                    break;
+                default:
+                    cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+                    break;
+            }
             node.addComponent(cmpRigid);
         }
+        let ball = root.getChildrenByName("ball")[0];
+        cmpRigid = new f.ComponentRigidbody(1, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+        ball.addComponent(cmpRigid);
+    }
+    function createProps() {
+        props = new f.Node("Props");
+        for (let i = 0; i < propAmount; i++) {
+            let randomPos = Math.random() + i;
+            let randomScale = 1 + Math.random();
+            let prop = new L06_PuzzleGame.Prop(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
+            props.addChild(prop);
+        }
+        root.addChild(props);
     }
     function hndMouseMovement(_event) {
         if (isLocked) {
             camBufferX += _event.movementX;
             camBufferY += _event.movementY;
-            let playerForward = avatar.camNode.mtxLocal.getZ();
-            console.log(playerForward);
+            // let playerForward: f.Vector3 = avatar.camNode.mtxLocal.getZ();
+            // console.log(playerForward);
         }
     }
     function updateCamera(_x, _y) {
         //avatar.mtxLocal.rotateY(-_x * camSpeed, true);
-        avatar.camNode.mtxLocal.rotateY(-_x * camSpeed, true);
-        cmpCamera.mtxPivot.rotateX(_y * camSpeed);
+        avatar.camNode.mtxLocal.rotateY(_x * camSpeed, true);
+        avatar.camNode.mtxLocal.rotateZ(_y * camSpeed);
         camBufferX = 0;
         camBufferY = 0;
     }
     function checkKeyboardInputs() {
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE])) {
             avatar.jump();
+        }
+        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.Y])) {
+            f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
         }
     }
     function hndKeyDown(_event) {
@@ -121,7 +151,19 @@ var L06_PuzzleGame;
     function onPointerDown(_event) {
         if (!isLocked) {
             app.requestPointerLock();
-            console.log("locked");
+        }
+        else {
+            switch (_event.button) {
+                case 1:
+                    avatar.shootPush();
+                    break;
+                case 2:
+                    avatar.shootPull();
+                    break;
+                default:
+                    avatar.shootPush();
+                    break;
+            }
         }
     }
     function pointerLockChange(_event) {

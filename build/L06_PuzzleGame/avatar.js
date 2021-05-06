@@ -9,24 +9,32 @@ var L06_PuzzleGame;
             this.defaultSpeed = 5;
             this.movementSpeed = 5;
             this.isGrounded = false;
-            this.jumpForce = 200;
+            this.jumpForce = 120;
             this.weight = 75;
-            this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CAPSULE, f.PHYSICS_GROUP.DEFAULT);
+            //Transform
             let cmpTransform = new f.ComponentTransform();
-            this.addComponent(this.cmpRigid);
-            this.addComponent(cmpTransform);
             cmpTransform.mtxLocal.scale(new f.Vector3(1, 1, 1));
             cmpTransform.mtxLocal.translate(new f.Vector3(0, 4, 0));
+            this.addComponent(cmpTransform);
+            //Rigid
+            this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CAPSULE, f.PHYSICS_GROUP.DEFAULT);
+            this.addComponent(this.cmpRigid);
             this.cmpRigid.rotationInfluenceFactor = new f.Vector3(0, 0, 0);
             this.cmpRigid.friction = 0.01;
-            this.addChild(this.camNode);
+            this.cmpRigid.restitution = 0;
             //Camera
+            this.addChild(this.camNode);
             this.cmpCamera = _cmpCamera;
+            this.cmpCamera.projectCentral(1, 90, f.FIELD_OF_VIEW.DIAGONAL, 0.2, 2000);
+            this.cmpCamera.clrBackground = f.Color.CSS("SlateGrey");
             this.cmpCamera.mtxPivot.rotate(new f.Vector3(0, 90, 0));
             let cmpCamTransform = new f.ComponentTransform();
             this.camNode.addComponent(cmpCamTransform);
             this.camNode.addComponent(this.cmpCamera);
             this.camNode.mtxLocal.translateY(1);
+            //Gun
+            this.gun = new L06_PuzzleGame.GravityGun();
+            this.camNode.addChild(this.gun);
         }
         move(_forward, _sideward) {
             let playerForward = this.camNode.mtxLocal.getX();
@@ -60,6 +68,38 @@ var L06_PuzzleGame;
         walk() {
             if (this.movementSpeed != this.defaultSpeed)
                 this.movementSpeed = this.defaultSpeed;
+        }
+        shootPull() {
+            let hitInfo;
+            let direction = this.camNode.mtxLocal.getX();
+            direction.normalize();
+            let origin = this.cmpRigid.getPosition();
+            origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
+            hitInfo = f.Physics.raycast(origin, direction, 10);
+            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+                hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
+            }
+            else {
+                return;
+            }
+        }
+        shootPush() {
+            let hitInfo;
+            let direction = this.camNode.mtxLocal.getX();
+            direction.normalize();
+            let origin = this.cmpRigid.getPosition();
+            origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
+            hitInfo = f.Physics.raycast(origin, direction, 10);
+            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+                hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
+            }
+            else {
+                return;
+            }
+        }
+        tryPickUp(_node) {
+            this.camNode.addChild(_node);
+            _node.mtxLocal.set(f.Matrix4x4.TRANSLATION(f.Vector3.Z(1.5)));
         }
     }
     L06_PuzzleGame.Avatar = Avatar;

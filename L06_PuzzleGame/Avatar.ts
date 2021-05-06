@@ -4,29 +4,38 @@ namespace L06_PuzzleGame {
     public cmpCamera: f.ComponentCamera;
     public cmpRigid: f.ComponentRigidbody;
     public camNode: f.Node = new f.Node("Cam");
+    public gun: GravityGun;
     private defaultSpeed: number = 5;
     private movementSpeed: number = 5;
     private isGrounded: boolean = false;
-    private jumpForce: number = 200;
+    private jumpForce: number = 120;
     private weight: number = 75;
     constructor(_cmpCamera: f.ComponentCamera) {
       super("Avatar");
-      this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CAPSULE, f.PHYSICS_GROUP.DEFAULT);
+      //Transform
       let cmpTransform: f.ComponentTransform = new f.ComponentTransform();
-      this.addComponent(this.cmpRigid);
-      this.addComponent(cmpTransform);
       cmpTransform.mtxLocal.scale(new f.Vector3(1, 1, 1));
       cmpTransform.mtxLocal.translate(new f.Vector3(0, 4, 0));
+      this.addComponent(cmpTransform);
+      //Rigid
+      this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CAPSULE, f.PHYSICS_GROUP.DEFAULT);
+      this.addComponent(this.cmpRigid);
       this.cmpRigid.rotationInfluenceFactor = new f.Vector3(0, 0, 0);
       this.cmpRigid.friction = 0.01;
-      this.addChild(this.camNode);
+      this.cmpRigid.restitution = 0;
       //Camera
+      this.addChild(this.camNode);
       this.cmpCamera = _cmpCamera;
+      this.cmpCamera.projectCentral(1, 90, f.FIELD_OF_VIEW.DIAGONAL, 0.2, 2000);
+      this.cmpCamera.clrBackground = f.Color.CSS("SlateGrey");
       this.cmpCamera.mtxPivot.rotate(new f.Vector3(0, 90, 0));
       let cmpCamTransform: f.ComponentTransform = new f.ComponentTransform();
       this.camNode.addComponent(cmpCamTransform);
       this.camNode.addComponent(this.cmpCamera);
       this.camNode.mtxLocal.translateY(1);
+      //Gun
+      this.gun = new GravityGun();
+      this.camNode.addChild(this.gun);
     }
 
     public move(_forward: number, _sideward: number): void {
@@ -57,6 +66,37 @@ namespace L06_PuzzleGame {
     }
     public walk(): void {
       if (this.movementSpeed != this.defaultSpeed) this.movementSpeed = this.defaultSpeed;
+    }
+
+    public shootPull(): void {
+      let hitInfo: f.RayHitInfo;
+      let direction: f.Vector3 = this.camNode.mtxLocal.getX();
+      direction.normalize();
+      let origin: f.Vector3 = this.cmpRigid.getPosition();
+      origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
+      hitInfo = f.Physics.raycast(origin, direction, 10);
+      if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+        hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
+      } else {
+        return;
+      }
+    }
+    public shootPush(): void {
+      let hitInfo: f.RayHitInfo;
+      let direction: f.Vector3 = this.camNode.mtxLocal.getX();
+      direction.normalize();
+      let origin: f.Vector3 = this.cmpRigid.getPosition();
+      origin.transform(f.Matrix4x4.TRANSLATION(new f.Vector3(direction.x, direction.y + 1, direction.z)));
+      hitInfo = f.Physics.raycast(origin, direction, 10);
+      if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+        hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
+      } else {
+        return;
+      }
+    }
+    public tryPickUp(_node: f.Node): void {
+      this.camNode.addChild(_node);
+      _node.mtxLocal.set(f.Matrix4x4.TRANSLATION(f.Vector3.Z(1.5)));
     }
   }
 }
