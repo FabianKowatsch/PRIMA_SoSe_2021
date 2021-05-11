@@ -47,7 +47,6 @@ namespace L06_PuzzleGame {
     f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
     checkKeyboardInputs();
     updateCamera(camBufferX, camBufferY);
-    avatar.checkIfGrounded();
     avatar.move(forwardMovement, sideMovement);
     avatar.tryGrabLastNode();
     viewport.draw();
@@ -90,10 +89,16 @@ namespace L06_PuzzleGame {
   function createProps(): void {
     props = new f.Node("Props");
     for (let i: number = 0; i < propAmount; i++) {
-      let randomPos: number = Math.random() + i;
-      let randomScale: number = 1 + Math.random();
-      let prop: Prop = new Prop(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-      props.addChild(prop);
+      let random: number = Math.random();
+      let randomPos: number = random + i;
+      let randomScale: number = 1 + random;
+      if (random >= 0.5) {
+        let prop: CubeProp = new CubeProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
+        props.addChild(prop);
+      } else {
+        let prop: SphereProp = new SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
+        props.addChild(prop);
+      }
     }
     root.addChild(props);
   }
@@ -141,6 +146,9 @@ namespace L06_PuzzleGame {
     }
     if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
       avatar.sprint();
+    }
+    if (_event.code == f.KEYBOARD_CODE.E) {
+      avatar.switchCloseNode();
     }
   }
 

@@ -51,18 +51,9 @@ var L06_PuzzleGame;
             this.cmpRigid.setVelocity(movementVel);
         }
         jump() {
+            this.checkIfGrounded();
             if (this.isGrounded)
                 this.cmpRigid.applyLinearImpulse(new f.Vector3(0, this.jumpForce, 0));
-        }
-        checkIfGrounded() {
-            let hitInfo;
-            hitInfo = f.Physics.raycast(this.cmpRigid.getPosition(), new f.Vector3(0, -1, 0), 1.1);
-            if (hitInfo.hit) {
-                this.isGrounded = true;
-            }
-            else {
-                this.isGrounded = false;
-            }
         }
         sprint() {
             if (this.movementSpeed != 8)
@@ -112,6 +103,19 @@ var L06_PuzzleGame;
                 this.hasProp = true;
             }
         }
+        switchCloseNode() {
+            if (this.hasProp == true) {
+                this.letFall(false);
+                return;
+            }
+            let hitInfo = this.avatarHitInfo(2);
+            if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+                let node = hitInfo.rigidbodyComponent.getContainer();
+                this.activeProp = node;
+                this.pickUp(node);
+                this.hasProp = true;
+            }
+        }
         pickUp(_node) {
             this.propRigid = _node.getComponent(f.ComponentRigidbody);
             _node.removeComponent(this.propRigid);
@@ -131,10 +135,20 @@ var L06_PuzzleGame;
                 this.activeProp.addComponent(this.propRigid);
                 this.getParent().addChild(this.activeProp);
                 this.activeProp = null;
+                this.hasProp = false;
                 if (!_shooting) {
                     this.propRigid = null;
                 }
-                this.hasProp = false;
+            }
+        }
+        checkIfGrounded() {
+            let hitInfo;
+            hitInfo = f.Physics.raycast(this.cmpRigid.getPosition(), new f.Vector3(0, -1, 0), 1.1);
+            if (hitInfo.hit) {
+                this.isGrounded = true;
+            }
+            else {
+                this.isGrounded = false;
             }
         }
         avatarHitInfo(_distance) {

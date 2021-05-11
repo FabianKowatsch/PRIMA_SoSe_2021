@@ -53,17 +53,10 @@ namespace L06_PuzzleGame {
       this.cmpRigid.setVelocity(movementVel);
     }
     public jump(): void {
+      this.checkIfGrounded();
       if (this.isGrounded) this.cmpRigid.applyLinearImpulse(new f.Vector3(0, this.jumpForce, 0));
     }
-    public checkIfGrounded(): void {
-      let hitInfo: f.RayHitInfo;
-      hitInfo = f.Physics.raycast(this.cmpRigid.getPosition(), new f.Vector3(0, -1, 0), 1.1);
-      if (hitInfo.hit) {
-        this.isGrounded = true;
-      } else {
-        this.isGrounded = false;
-      }
-    }
+
     public sprint(): void {
       if (this.movementSpeed != 8) this.movementSpeed = 8;
     }
@@ -109,6 +102,22 @@ namespace L06_PuzzleGame {
         this.hasProp = true;
       }
     }
+
+    public switchCloseNode(): void {
+      if (this.hasProp == true) {
+        this.letFall(false);
+        return;
+      }
+
+      let hitInfo: f.RayHitInfo = this.avatarHitInfo(2);
+      if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
+        let node: f.Node = hitInfo.rigidbodyComponent.getContainer();
+        this.activeProp = node;
+        this.pickUp(node);
+        this.hasProp = true;
+      }
+    }
+
     public pickUp(_node: f.Node): void {
       this.propRigid = _node.getComponent(f.ComponentRigidbody);
       _node.removeComponent(this.propRigid);
@@ -129,10 +138,19 @@ namespace L06_PuzzleGame {
         this.activeProp.addComponent(this.propRigid);
         this.getParent().addChild(this.activeProp);
         this.activeProp = null;
+        this.hasProp = false;
         if (!_shooting) {
           this.propRigid = null;
         }
-        this.hasProp = false;
+      }
+    }
+    private checkIfGrounded(): void {
+      let hitInfo: f.RayHitInfo;
+      hitInfo = f.Physics.raycast(this.cmpRigid.getPosition(), new f.Vector3(0, -1, 0), 1.1);
+      if (hitInfo.hit) {
+        this.isGrounded = true;
+      } else {
+        this.isGrounded = false;
       }
     }
 

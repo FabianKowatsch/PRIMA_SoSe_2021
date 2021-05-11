@@ -44,7 +44,6 @@ var L06_PuzzleGame;
         f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
         checkKeyboardInputs();
         updateCamera(camBufferX, camBufferY);
-        avatar.checkIfGrounded();
         avatar.move(forwardMovement, sideMovement);
         avatar.tryGrabLastNode();
         viewport.draw();
@@ -85,10 +84,17 @@ var L06_PuzzleGame;
     function createProps() {
         props = new f.Node("Props");
         for (let i = 0; i < propAmount; i++) {
-            let randomPos = Math.random() + i;
-            let randomScale = 1 + Math.random();
-            let prop = new L06_PuzzleGame.Prop(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-            props.addChild(prop);
+            let random = Math.random();
+            let randomPos = random + i;
+            let randomScale = 1 + random;
+            if (random >= 0.5) {
+                let prop = new L06_PuzzleGame.CubeProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
+                props.addChild(prop);
+            }
+            else {
+                let prop = new L06_PuzzleGame.SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
+                props.addChild(prop);
+            }
         }
         root.addChild(props);
     }
@@ -130,6 +136,9 @@ var L06_PuzzleGame;
         }
         if (_event.code == f.KEYBOARD_CODE.SHIFT_LEFT) {
             avatar.sprint();
+        }
+        if (_event.code == f.KEYBOARD_CODE.E) {
+            avatar.switchCloseNode();
         }
     }
     function hndKeyRelease(_event) {
