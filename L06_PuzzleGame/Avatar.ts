@@ -13,6 +13,7 @@ namespace L06_PuzzleGame {
     private activeProp: f.Node = null;
     private hasProp: boolean = false;
     private propRigid: f.ComponentRigidbody = null;
+
     constructor(_cmpCamera: f.ComponentCamera) {
       super("Avatar");
       //Transform
@@ -36,6 +37,8 @@ namespace L06_PuzzleGame {
       this.camNode.addComponent(cmpCamTransform);
       this.camNode.addComponent(this.cmpCamera);
       this.camNode.mtxLocal.translateY(1);
+      //audio
+      this.camNode.addComponent(new f.ComponentAudioListener());
       //Gun
       this.gun = new GravityGun();
       this.camNode.addChild(this.gun);
@@ -74,6 +77,7 @@ namespace L06_PuzzleGame {
           this.activeProp = hitInfo.rigidbodyComponent.getContainer();
         }
       }
+      this.gun.playPullSound();
     }
     public shootPush(): void {
       let direction: f.Vector3 = this.camNode.mtxLocal.getX();
@@ -83,8 +87,6 @@ namespace L06_PuzzleGame {
         if (hitInfo.hit) {
           if (hitInfo.rigidbodyComponent.physicsType != 1) {
             hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
-          } else {
-            console.log(hitInfo.rigidbodyComponent.physicsType);
           }
         }
       } else {
@@ -92,7 +94,9 @@ namespace L06_PuzzleGame {
         this.propRigid.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
         this.propRigid = null;
       }
+      this.gun.playPushSound();
     }
+
     public tryGrabLastNode(): void {
       if (this.activeProp == null || this.hasProp == true) return;
 
@@ -122,8 +126,8 @@ namespace L06_PuzzleGame {
       this.propRigid = _node.getComponent(f.ComponentRigidbody);
       _node.removeComponent(this.propRigid);
       this.camNode.addChild(_node);
-      _node.mtxLocal.set(f.Matrix4x4.TRANSLATION(new f.Vector3(3, 0, 0)));
-      // _node.getComponent(f.ComponentRigidbody).collisionGroup = f.PHYSICS_GROUP.DEFAULT;
+      _node.mtxLocal.translation = new f.Vector3(3, 0, 0);
+      //_node.mtxLocal.rotation = new f.Vector3(0, 0, 0);
     }
 
     public letFall(_shooting: boolean = false): void {

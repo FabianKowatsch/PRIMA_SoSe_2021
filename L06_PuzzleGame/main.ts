@@ -9,8 +9,6 @@ namespace L06_PuzzleGame {
   let root: f.Graph = new f.Graph("root");
   let props: f.Node;
   const propAmount: number = 12;
-  let camBufferX: number = 0;
-  let camBufferY: number = 0;
   const camSpeed: number = -0.15;
   let isLocked: boolean = false;
   let forwardMovement: number = 0;
@@ -31,6 +29,8 @@ namespace L06_PuzzleGame {
     createRigidbodies();
     viewport = new f.Viewport();
     viewport.initialize("Viewport", root, cmpCamera, app);
+    f.AudioManager.default.listenTo(root);
+    f.AudioManager.default.listenWith(avatar.camNode.getComponent(f.ComponentAudioListener));
     f.Physics.adjustTransforms(root, true);
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(); //Stard the game loop
@@ -46,9 +46,10 @@ namespace L06_PuzzleGame {
   function update(): void {
     f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
     checkKeyboardInputs();
-    updateCamera(camBufferX, camBufferY);
+    checkCollisions();
     avatar.move(forwardMovement, sideMovement);
     avatar.tryGrabLastNode();
+    f.AudioManager.default.update();
     viewport.draw();
   }
   function initPhysics(): void {
@@ -98,6 +99,7 @@ namespace L06_PuzzleGame {
       } else {
         let prop: SphereProp = new SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
         props.addChild(prop);
+        prop.cmpRigid.addEventListener(f.EVENT_PHYSICS.COLLISION_ENTER, prop.onCollision);
       }
     }
     root.addChild(props);
@@ -105,29 +107,21 @@ namespace L06_PuzzleGame {
 
   function hndMouseMovement(_event: MouseEvent): void {
     if (isLocked) {
-      camBufferX += _event.movementX;
-      camBufferY += _event.movementY;
-      // let playerForward: f.Vector3 = avatar.camNode.mtxLocal.getZ();
-      // console.log(playerForward);
+      avatar.camNode.mtxLocal.rotateY(_event.movementX * camSpeed, true);
+      avatar.camNode.mtxLocal.rotateZ(_event.movementY * camSpeed);
     }
-  }
-
-  function updateCamera(_x: number, _y: number): void {
-    //avatar.mtxLocal.rotateY(-_x * camSpeed, true);
-    avatar.camNode.mtxLocal.rotateY(_x * camSpeed, true);
-
-    avatar.camNode.mtxLocal.rotateZ(_y * camSpeed);
-
-    camBufferX = 0;
-    camBufferY = 0;
   }
 
   function checkKeyboardInputs(): void {
     if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE])) {
       avatar.jump();
     }
-    if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.Y])) {
-      f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
+  }
+
+  function checkCollisions(): void {
+    let props: f.Node = root.getChildrenByName("Props")[0];
+    for (let prop of props.getChildren() as Prop[]) {
+      prop.cmpRigid.checkCollisionEvents();
     }
   }
 
@@ -149,6 +143,9 @@ namespace L06_PuzzleGame {
     }
     if (_event.code == f.KEYBOARD_CODE.E) {
       avatar.switchCloseNode();
+    }
+    if (_event.code == f.KEYBOARD_CODE.Y) {
+      f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
     }
   }
 

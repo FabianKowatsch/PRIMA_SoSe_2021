@@ -1,10 +1,14 @@
 namespace L06_PuzzleGame {
   import f = FudgeCore;
   export class GravityGun extends f.Node {
+    private static audioPull: f.Audio = new f.Audio("../../L06_PuzzleGame/Assets/Sound/pull.mp3");
+    private static audioPush: f.Audio = new f.Audio("../../L06_PuzzleGame/Assets/Sound/push.mp3");
     private static mesh: f.Mesh = new f.MeshCube("Gun");
     private static material: f.Material = new f.Material("MaterialGun", f.ShaderFlat, new f.CoatColored(f.Color.CSS("grey")));
     public cmpRigid: f.ComponentRigidbody;
     private grip: f.Node;
+    private cmpAudioPush: f.ComponentAudio;
+    private cmpAudioPull: f.ComponentAudio;
     constructor() {
       super("GravityGun");
       //Transform
@@ -31,6 +35,27 @@ namespace L06_PuzzleGame {
       gripTr.mtxLocal.rotate(new f.Vector3(0, 0, 0));
       this.grip.addComponent(gripTr);
       this.addChild(this.grip);
+      //Audio
+      let audioNodePush: f.Node = new f.Node("AudioPush");
+      this.cmpAudioPush = new f.ComponentAudio(GravityGun.audioPush, false, false);
+      audioNodePush.addComponent(this.cmpAudioPush);
+      this.cmpAudioPush.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
+      this.cmpAudioPush.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
+      this.addChild(audioNodePush);
+
+      let audioNodePull: f.Node = new f.Node("AudioPull");
+      this.cmpAudioPull = new f.ComponentAudio(GravityGun.audioPull, false, false);
+      audioNodePull.addComponent(this.cmpAudioPull);
+      this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
+      this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
+      this.addChild(audioNodePull);
+    }
+
+    public playPushSound(): void {
+      this.cmpAudioPush.play(true);
+    }
+    public playPullSound(): void {
+      this.cmpAudioPull.play(true);
     }
   }
 }

@@ -10,8 +10,6 @@ var L06_PuzzleGame;
     let root = new f.Graph("root");
     let props;
     const propAmount = 12;
-    let camBufferX = 0;
-    let camBufferY = 0;
     const camSpeed = -0.15;
     let isLocked = false;
     let forwardMovement = 0;
@@ -29,6 +27,8 @@ var L06_PuzzleGame;
         createRigidbodies();
         viewport = new f.Viewport();
         viewport.initialize("Viewport", root, cmpCamera, app);
+        f.AudioManager.default.listenTo(root);
+        f.AudioManager.default.listenWith(avatar.camNode.getComponent(f.ComponentAudioListener));
         f.Physics.adjustTransforms(root, true);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
@@ -43,9 +43,10 @@ var L06_PuzzleGame;
     function update() {
         f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
         checkKeyboardInputs();
-        updateCamera(camBufferX, camBufferY);
+        checkCollisions();
         avatar.move(forwardMovement, sideMovement);
         avatar.tryGrabLastNode();
+        f.AudioManager.default.update();
         viewport.draw();
     }
     function initPhysics() {
@@ -94,31 +95,26 @@ var L06_PuzzleGame;
             else {
                 let prop = new L06_PuzzleGame.SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
                 props.addChild(prop);
+                prop.cmpRigid.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, prop.onCollision);
             }
         }
         root.addChild(props);
     }
     function hndMouseMovement(_event) {
         if (isLocked) {
-            camBufferX += _event.movementX;
-            camBufferY += _event.movementY;
-            // let playerForward: f.Vector3 = avatar.camNode.mtxLocal.getZ();
-            // console.log(playerForward);
+            avatar.camNode.mtxLocal.rotateY(_event.movementX * camSpeed, true);
+            avatar.camNode.mtxLocal.rotateZ(_event.movementY * camSpeed);
         }
-    }
-    function updateCamera(_x, _y) {
-        //avatar.mtxLocal.rotateY(-_x * camSpeed, true);
-        avatar.camNode.mtxLocal.rotateY(_x * camSpeed, true);
-        avatar.camNode.mtxLocal.rotateZ(_y * camSpeed);
-        camBufferX = 0;
-        camBufferY = 0;
     }
     function checkKeyboardInputs() {
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.SPACE])) {
             avatar.jump();
         }
-        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.Y])) {
-            f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
+    }
+    function checkCollisions() {
+        let props = root.getChildrenByName("Props")[0];
+        for (let prop of props.getChildren()) {
+            prop.cmpRigid.checkCollisionEvents();
         }
     }
     function hndKeyDown(_event) {
@@ -139,6 +135,9 @@ var L06_PuzzleGame;
         }
         if (_event.code == f.KEYBOARD_CODE.E) {
             avatar.switchCloseNode();
+        }
+        if (_event.code == f.KEYBOARD_CODE.Y) {
+            f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
         }
     }
     function hndKeyRelease(_event) {
