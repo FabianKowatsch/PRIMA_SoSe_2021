@@ -95,7 +95,6 @@ var L06_PuzzleGame;
             else {
                 let prop = new L06_PuzzleGame.SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
                 props.addChild(prop);
-                prop.cmpRigid.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, prop.onCollision);
             }
         }
         root.addChild(props);

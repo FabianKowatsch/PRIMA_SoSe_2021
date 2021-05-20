@@ -28,11 +28,7 @@ var L06_PuzzleGame;
                 this.addComponent(this.cmpAudio);
                 this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
                 this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
-            }
-            onCollision(_event) {
-                let rigid = _event.target;
-                let node = rigid.getContainer();
-                node.cmpAudio.play(true);
+                this.addComponent(new L06_PuzzleGame.ComponentScriptProp());
             }
         }
         Prop.audio = new f.Audio("../../L06_PuzzleGame/Assets/Sound/impact.mp3");

@@ -99,7 +99,6 @@ namespace L06_PuzzleGame {
       } else {
         let prop: SphereProp = new SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
         props.addChild(prop);
-        prop.cmpRigid.addEventListener(f.EVENT_PHYSICS.COLLISION_ENTER, prop.onCollision);
       }
     }
     root.addChild(props);

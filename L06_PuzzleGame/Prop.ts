@@ -29,11 +29,7 @@ namespace L06_PuzzleGame {
       this.addComponent(this.cmpAudio);
       this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
       this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
-    }
-    public onCollision(_event: f.EventPhysics): void {
-      let rigid: f.ComponentRigidbody = _event.target as f.ComponentRigidbody;
-      let node: Prop = rigid.getContainer() as Prop;
-      node.cmpAudio.play(true);
+      this.addComponent(new ComponentScriptProp());
     }
   }
 }
