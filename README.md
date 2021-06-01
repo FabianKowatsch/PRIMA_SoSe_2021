@@ -27,7 +27,7 @@ Repository for the module "Prototyping interactive media-applications and games"
 
 ## Skizze
 
-![Skizze](./Design/Skizze.PNG?raw=true "Skizze")
+![Skizze](https://github.com/FabianKowatsch/PRIMA_SoSe_2021/blob/main/Design/Skizze.PNG?raw=true "Skizze")
 
 ## Abgabeformat
 
