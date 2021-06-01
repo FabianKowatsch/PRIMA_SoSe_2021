@@ -25,6 +25,10 @@ Repository for the module "Prototyping interactive media-applications and games"
 |  10 | Maße & Positionen            | Der Ursprung der Welt ist der Startpunkt des Avatars, dieser ist 2 Einheiten hoch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |  11 | Event-System                 | Events werden unter anderem bei Kollisionen genutzt. Dabei sendet der Collider, der mit einem Objekt kollidiert ein Event an die Skriptkomponente des Objekts, das daraufhin einen Sound abspielt. Außerdem werden Events durch Nutzereingaben ausgelöst, um z.B. den Avatar zu steuern.                                                                                                                                                                                                                                                                         |
 
+## Skizze
+
+![Skizze](Design/Skizze.png?raw=true "Skizze")
+
 ## Abgabeformat
 
 - Fasse die Konzeption als ein wohlformatiertes Designdokument in PDF zusammen!
