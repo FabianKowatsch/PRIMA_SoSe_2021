@@ -27,7 +27,7 @@ Repository for the module "Prototyping interactive media-applications and games"
 
 ## Skizze
 
-![Skizze](Design/Skizze.png?raw=true "Skizze")
+![Skizze](./Design/Skizze.PNG?raw=true "Skizze")
 
 ## Abgabeformat
 
