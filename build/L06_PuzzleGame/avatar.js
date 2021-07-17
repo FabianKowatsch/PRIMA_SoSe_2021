@@ -3,17 +3,23 @@ var L06_PuzzleGame;
 (function (L06_PuzzleGame) {
     var f = FudgeCore;
     class Avatar extends f.Node {
-        constructor(_cmpCamera) {
+        constructor(_cmpCamera, _speed, _force, _weight) {
             super("Avatar");
             this.camNode = new f.Node("Cam");
-            this.defaultSpeed = 5;
-            this.movementSpeed = 5;
             this.isGrounded = false;
-            this.jumpForce = 120;
-            this.weight = 75;
             this.activeProp = null;
             this.hasProp = false;
             this.propRigid = null;
+            this.hndFrame = (_event) => {
+                // if (this.hookPoint) {
+                //   Tools.drawLine(this.viewport, this.hookPoint, this.gun.mtxWorld.translation);
+                // }
+            };
+            //Properties
+            this.weight = _weight;
+            this.defaultSpeed = _speed;
+            this.movementSpeed = _speed;
+            this.jumpForce = _force;
             //Transform
             let cmpTransform = new f.ComponentTransform();
             cmpTransform.mtxLocal.scale(new f.Vector3(1, 1, 1));
@@ -40,6 +46,7 @@ var L06_PuzzleGame;
             //Gun
             this.gun = new L06_PuzzleGame.GravityGun();
             this.camNode.addChild(this.gun);
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.hndFrame);
         }
         move(_forward, _sideward) {
             let playerForward = this.camNode.mtxLocal.getX();
@@ -141,6 +148,42 @@ var L06_PuzzleGame;
                     this.propRigid = null;
                 }
             }
+        }
+        useHook() {
+            let direction = this.camNode.mtxLocal.getX();
+            direction.normalize();
+            if (!this.hasProp) {
+                let hitInfo = this.avatarHitInfo(10);
+                if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType == 1) {
+                    //ROPE
+                    let gunPos = this.gun.mtxWorld.translation;
+                    let nextNode = hitInfo.rigidbodyComponent.getContainer();
+                    let nodePos = nextNode.mtxWorld.translation;
+                    nodePos.y--;
+                    let ropePos = nextNode.mtxWorld.translation;
+                    ropePos.y--;
+                    let middle = nextNode.mtxWorld.translation;
+                    middle.y--;
+                    middle.subtract(gunPos);
+                    middle.scale(0.5);
+                    ropePos.subtract(middle);
+                    let scale = new f.Vector3(0.03, 0.03, middle.magnitude * 0.97);
+                    let rope = new L06_PuzzleGame.Rope(ropePos, nodePos, scale);
+                    //JOINTS
+                    let jointNext = new f.ComponentJointSpherical(rope.cmpRigid, hitInfo.rigidbodyComponent, nodePos);
+                    jointNext.springDamping = 0.1;
+                    jointNext.springFrequency = 10;
+                    let jointAvatar = new f.ComponentJointSpherical(rope.cmpRigid, this.cmpRigid, gunPos);
+                    jointAvatar.springDamping = 1;
+                    jointAvatar.springFrequency = 100;
+                    rope.addComponent(jointNext);
+                    rope.addComponent(jointAvatar);
+                    nextNode.addChild(rope);
+                    f.Physics.adjustTransforms(rope, true);
+                }
+            }
+            //this.cmpRigid.applyForce(new f.Vector3(0, this.weight * 111, 0));
+            // this.gun.playPushSound();
         }
         checkIfGrounded() {
             let hitInfo;

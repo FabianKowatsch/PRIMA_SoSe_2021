@@ -14,18 +14,21 @@ var L06_PuzzleGame;
     let isLocked = false;
     let forwardMovement = 0;
     let sideMovement = 0;
+    let config;
     window.addEventListener("load", init);
     async function init(_event) {
+        let response = await fetch("Config.json");
+        config = await response.json();
         await f.Project.loadResourcesFromHTML();
         let resource = f.Project.resources[graphId];
         root = resource;
         app = document.querySelector("canvas");
         //cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
+        viewport = new f.Viewport();
         initPhysics();
         createAvatar();
         createProps();
         createRigidbodies();
-        viewport = new f.Viewport();
         viewport.initialize("Viewport", root, cmpCamera, app);
         f.AudioManager.default.listenTo(root);
         f.AudioManager.default.listenWith(avatar.camNode.getComponent(f.ComponentAudioListener));
@@ -48,6 +51,7 @@ var L06_PuzzleGame;
         avatar.tryGrabLastNode();
         f.AudioManager.default.update();
         viewport.draw();
+        // Tools.drawLine(viewport, new f.Vector3(2, 2, 3), new f.Vector3(1, 2, 3));
     }
     function initPhysics() {
         f.Physics.initializePhysics();
@@ -58,13 +62,27 @@ var L06_PuzzleGame;
     }
     function createAvatar() {
         cmpCamera = new f.ComponentCamera();
-        avatar = new L06_PuzzleGame.Avatar(cmpCamera);
+        avatar = new L06_PuzzleGame.Avatar(cmpCamera, config.speed, config.jumpforce, config.weight);
         root.appendChild(avatar);
     }
     function createRigidbodies() {
         let level = root.getChildrenByName("level")[0];
         let cmpRigid;
         for (let node of level.getChildren()) {
+            if (node.getChildren().length != 0) {
+                for (let child of node.getChildren()) {
+                    addRigidBasedOnMesh(child);
+                }
+            }
+            addRigidBasedOnMesh(node);
+        }
+        let ball = root.getChildrenByName("ball")[0];
+        cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+        ball.addComponent(cmpRigid);
+    }
+    function addRigidBasedOnMesh(node) {
+        if (!node.getComponent(f.ComponentRigidbody)) {
+            let cmpRigid;
             switch (node.getComponent(f.ComponentMesh).mesh.name) {
                 case "meshCube":
                     cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
@@ -72,15 +90,15 @@ var L06_PuzzleGame;
                 case "meshExtrusion":
                     cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
                     break;
+                case "meshSphere":
+                    cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+                    break;
                 default:
                     cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
                     break;
             }
             node.addComponent(cmpRigid);
         }
-        let ball = root.getChildrenByName("ball")[0];
-        cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
-        ball.addComponent(cmpRigid);
     }
     function createProps() {
         props = new f.Node("Props");
@@ -134,6 +152,9 @@ var L06_PuzzleGame;
         }
         if (_event.code == f.KEYBOARD_CODE.E) {
             avatar.switchCloseNode();
+        }
+        if (_event.code == f.KEYBOARD_CODE.F) {
+            avatar.useHook();
         }
         if (_event.code == f.KEYBOARD_CODE.Y) {
             f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;

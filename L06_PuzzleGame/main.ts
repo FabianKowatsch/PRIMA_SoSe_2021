@@ -1,5 +1,10 @@
 namespace L06_PuzzleGame {
   import f = FudgeCore;
+  type Config = {
+    speed: number;
+    jumpforce: number;
+    weight: number;
+  };
 
   const graphId: string = "Graph|2021-04-27T14:37:53.620Z|93013";
   let app: HTMLCanvasElement;
@@ -13,21 +18,24 @@ namespace L06_PuzzleGame {
   let isLocked: boolean = false;
   let forwardMovement: number = 0;
   let sideMovement: number = 0;
+  let config: Config;
 
   window.addEventListener("load", init);
 
   async function init(_event: Event): Promise<void> {
+    let response: Response = await fetch("Config.json");
+    config = await response.json();
     await f.Project.loadResourcesFromHTML();
     let resource: f.SerializableResource = f.Project.resources[graphId];
     root = <f.Graph>resource;
 
     app = document.querySelector("canvas");
     //cmpCamera.mtxPivot.lookAt(new f.Vector3(0, 0, 110));
+    viewport = new f.Viewport();
     initPhysics();
     createAvatar();
     createProps();
     createRigidbodies();
-    viewport = new f.Viewport();
     viewport.initialize("Viewport", root, cmpCamera, app);
     f.AudioManager.default.listenTo(root);
     f.AudioManager.default.listenWith(avatar.camNode.getComponent(f.ComponentAudioListener));
@@ -51,6 +59,7 @@ namespace L06_PuzzleGame {
     avatar.tryGrabLastNode();
     f.AudioManager.default.update();
     viewport.draw();
+    // Tools.drawLine(viewport, new f.Vector3(2, 2, 3), new f.Vector3(1, 2, 3));
   }
   function initPhysics(): void {
     f.Physics.initializePhysics();
@@ -61,7 +70,7 @@ namespace L06_PuzzleGame {
   }
   function createAvatar(): void {
     cmpCamera = new f.ComponentCamera();
-    avatar = new Avatar(cmpCamera);
+    avatar = new Avatar(cmpCamera, config.speed, config.jumpforce, config.weight);
     root.appendChild(avatar);
   }
 
@@ -69,6 +78,21 @@ namespace L06_PuzzleGame {
     let level: f.Node = root.getChildrenByName("level")[0];
     let cmpRigid: f.ComponentRigidbody;
     for (let node of level.getChildren()) {
+      if (node.getChildren().length != 0) {
+        for (let child of node.getChildren()) {
+          addRigidBasedOnMesh(child);
+        }
+      }
+      addRigidBasedOnMesh(node);
+    }
+    let ball: f.Node = root.getChildrenByName("ball")[0];
+    cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+    ball.addComponent(cmpRigid);
+  }
+
+  function addRigidBasedOnMesh(node: f.Node): void {
+    if (!node.getComponent(f.ComponentRigidbody)) {
+      let cmpRigid: f.ComponentRigidbody;
       switch (node.getComponent(f.ComponentMesh).mesh.name) {
         case "meshCube":
           cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
@@ -76,15 +100,15 @@ namespace L06_PuzzleGame {
         case "meshExtrusion":
           cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
           break;
+        case "meshSphere":
+          cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
+          break;
         default:
           cmpRigid = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
           break;
       }
       node.addComponent(cmpRigid);
     }
-    let ball: f.Node = root.getChildrenByName("ball")[0];
-    cmpRigid = new f.ComponentRigidbody(7, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.SPHERE, f.PHYSICS_GROUP.DEFAULT);
-    ball.addComponent(cmpRigid);
   }
 
   function createProps(): void {
@@ -142,6 +166,9 @@ namespace L06_PuzzleGame {
     }
     if (_event.code == f.KEYBOARD_CODE.E) {
       avatar.switchCloseNode();
+    }
+    if (_event.code == f.KEYBOARD_CODE.F) {
+      avatar.useHook();
     }
     if (_event.code == f.KEYBOARD_CODE.Y) {
       f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;

@@ -5,17 +5,22 @@ namespace L06_PuzzleGame {
     public cmpRigid: f.ComponentRigidbody;
     public camNode: f.Node = new f.Node("Cam");
     public gun: GravityGun;
-    private defaultSpeed: number = 5;
-    private movementSpeed: number = 5;
+    private defaultSpeed: number;
+    private movementSpeed: number;
     private isGrounded: boolean = false;
-    private jumpForce: number = 120;
-    private weight: number = 75;
+    private jumpForce: number;
+    private weight: number;
     private activeProp: f.Node = null;
     private hasProp: boolean = false;
     private propRigid: f.ComponentRigidbody = null;
 
-    constructor(_cmpCamera: f.ComponentCamera) {
+    constructor(_cmpCamera: f.ComponentCamera, _speed: number, _force: number, _weight: number) {
       super("Avatar");
+      //Properties
+      this.weight = _weight;
+      this.defaultSpeed = _speed;
+      this.movementSpeed = _speed;
+      this.jumpForce = _force;
       //Transform
       let cmpTransform: f.ComponentTransform = new f.ComponentTransform();
       cmpTransform.mtxLocal.scale(new f.Vector3(1, 1, 1));
@@ -42,6 +47,7 @@ namespace L06_PuzzleGame {
       //Gun
       this.gun = new GravityGun();
       this.camNode.addChild(this.gun);
+      f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.hndFrame);
     }
 
     public move(_forward: number, _sideward: number): void {
@@ -148,6 +154,50 @@ namespace L06_PuzzleGame {
         }
       }
     }
+
+    public useHook(): void {
+      let direction: f.Vector3 = this.camNode.mtxLocal.getX();
+      direction.normalize();
+      if (!this.hasProp) {
+        let hitInfo: f.RayHitInfo = this.avatarHitInfo(10);
+        if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType == 1) {
+          //ROPE
+          let gunPos: f.Vector3 = this.gun.mtxWorld.translation;
+          let nextNode: f.Node = hitInfo.rigidbodyComponent.getContainer();
+          let nodePos: f.Vector3 = nextNode.mtxWorld.translation;
+          nodePos.y--;
+          let ropePos: f.Vector3 = nextNode.mtxWorld.translation;
+          ropePos.y--;
+          let middle: f.Vector3 = nextNode.mtxWorld.translation;
+          middle.y--;
+          middle.subtract(gunPos);
+          middle.scale(0.5);
+          ropePos.subtract(middle);
+          let scale: f.Vector3 = new f.Vector3(0.03, 0.03, middle.magnitude * 0.97);
+          let rope: Rope = new Rope(ropePos, nodePos, scale);
+          //JOINTS
+          let jointNext: f.ComponentJointSpherical = new f.ComponentJointSpherical(rope.cmpRigid, hitInfo.rigidbodyComponent, nodePos);
+          jointNext.springDamping = 0.1;
+          jointNext.springFrequency = 10;
+
+          let jointAvatar: f.ComponentJointSpherical = new f.ComponentJointSpherical(rope.cmpRigid, this.cmpRigid, gunPos);
+          jointAvatar.springDamping = 1;
+          jointAvatar.springFrequency = 100;
+          rope.addComponent(jointNext);
+          rope.addComponent(jointAvatar);
+          nextNode.addChild(rope);
+          f.Physics.adjustTransforms(rope, true);
+        }
+      }
+      //this.cmpRigid.applyForce(new f.Vector3(0, this.weight * 111, 0));
+      // this.gun.playPushSound();
+    }
+    public hndFrame = (_event: Event): void => {
+      // if (this.hookPoint) {
+      //   Tools.drawLine(this.viewport, this.hookPoint, this.gun.mtxWorld.translation);
+      // }
+    };
+
     private checkIfGrounded(): void {
       let hitInfo: f.RayHitInfo;
       hitInfo = f.Physics.raycast(this.cmpRigid.getPosition(), new f.Vector3(0, -1, 0), 1.1);
