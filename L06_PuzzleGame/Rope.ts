@@ -4,7 +4,7 @@ namespace L06_PuzzleGame {
     private static material: f.Material = new f.Material("MaterialRope", f.ShaderFlat, new f.CoatColored(f.Color.CSS("brown")));
     private static mesh: f.Mesh = new f.MeshCube("Cube");
     public cmpRigid: f.ComponentRigidbody;
-    private weight: number = 10;
+    //private weight: number = 10;
     constructor(_position: f.Vector3, _direction: f.Vector3, _scale: f.Vector3) {
       super("rope");
       //Transform
@@ -32,13 +32,13 @@ namespace L06_PuzzleGame {
       let cmpMaterial: f.ComponentMaterial = new f.ComponentMaterial(Rope.material);
       this.addComponent(cmpMaterial);
       //Rigidbody
-      this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
-      this.addComponent(this.cmpRigid);
-      this.cmpRigid.rotationInfluenceFactor = new f.Vector3(0.5, 0.5, 0.5);
-      this.cmpRigid.friction = 0.8;
-      this.cmpRigid.mtxPivot.translation = _position;
-      //this.cmpRigid.mtxPivot.rotation = new f.Vector3(0, angleXZ, angleYZ);
-      this.cmpRigid.mtxPivot.lookAt(_direction);
+      // this.cmpRigid = new f.ComponentRigidbody(this.weight, f.PHYSICS_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+      // this.addComponent(this.cmpRigid);
+      // this.cmpRigid.rotationInfluenceFactor = new f.Vector3(0.5, 0.5, 0.5);
+      // this.cmpRigid.friction = 0.8;
+      // this.cmpRigid.mtxPivot.translation = _position;
+      // //this.cmpRigid.mtxPivot.rotation = new f.Vector3(0, angleXZ, angleYZ);
+      // this.cmpRigid.mtxPivot.lookAt(_direction);
     }
   }
 }

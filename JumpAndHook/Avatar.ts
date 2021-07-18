@@ -1,10 +1,10 @@
-namespace L06_PuzzleGame {
+namespace JumpandHook {
   import f = FudgeCore;
   export class Avatar extends f.Node {
     public cmpCamera: f.ComponentCamera;
     public cmpRigid: f.ComponentRigidbody;
     public camNode: f.Node = new f.Node("Cam");
-    public gun: GravityGun;
+    public hook: Hook;
     private defaultSpeed: number;
     private movementSpeed: number;
     private isGrounded: boolean = false;
@@ -45,8 +45,8 @@ namespace L06_PuzzleGame {
       //audio
       this.camNode.addComponent(new f.ComponentAudioListener());
       //Gun
-      this.gun = new GravityGun();
-      this.camNode.addChild(this.gun);
+      this.hook = new Hook();
+      this.camNode.addChild(this.hook);
     }
 
     public move(_forward: number, _sideward: number): void {
@@ -82,7 +82,7 @@ namespace L06_PuzzleGame {
           this.activeProp = hitInfo.rigidbodyComponent.getContainer();
         }
       }
-      this.gun.playPullSound();
+      this.hook.playPullSound();
     }
     public shootPush(): void {
       let direction: f.Vector3 = this.camNode.mtxLocal.getX();
@@ -99,7 +99,7 @@ namespace L06_PuzzleGame {
         this.propRigid.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
         this.propRigid = null;
       }
-      this.gun.playPushSound();
+      this.hook.playPushSound();
     }
 
     public tryGrabLastNode(): void {
@@ -164,13 +164,12 @@ namespace L06_PuzzleGame {
           let nextNode: f.Node = hitInfo.rigidbodyComponent.getContainer();
           let rope: f.Node = new f.Node("Rope");
           let cmpScript: ComponentScriptRope = new ComponentScriptRope(nextNode, 0.05);
-          console.log("starting");
-          this.gun.addChild(rope);
+          this.hook.addChild(rope);
           rope.addComponent(cmpScript);
         }
       }
       //this.cmpRigid.applyForce(new f.Vector3(0, this.weight * 111, 0));
-      // this.gun.playPushSound();
+      this.hook.playPushSound();
     }
 
     private checkIfGrounded(): void {

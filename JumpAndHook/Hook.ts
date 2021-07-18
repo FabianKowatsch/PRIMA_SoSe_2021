@@ -1,6 +1,6 @@
-namespace L06_PuzzleGame {
+namespace JumpandHook {
   import f = FudgeCore;
-  export class GravityGun extends f.Node {
+  export class Hook extends f.Node {
     private static audioPull: f.Audio = new f.Audio("../../L06_PuzzleGame/Assets/Sound/pull.mp3");
     private static audioPush: f.Audio = new f.Audio("../../L06_PuzzleGame/Assets/Sound/push.mp3");
     private static mesh: f.Mesh = new f.MeshCube("Gun");
@@ -21,9 +21,9 @@ namespace L06_PuzzleGame {
 
       //Barrel
       this.barrel = new f.Node("barrel");
-      let barrelMesh: f.ComponentMesh = new f.ComponentMesh(GravityGun.mesh);
+      let barrelMesh: f.ComponentMesh = new f.ComponentMesh(Hook.mesh);
       this.barrel.addComponent(barrelMesh);
-      let barrelMat: f.ComponentMaterial = new f.ComponentMaterial(GravityGun.material);
+      let barrelMat: f.ComponentMaterial = new f.ComponentMaterial(Hook.material);
       this.barrel.addComponent(barrelMat);
       let barrelTr: f.ComponentTransform = new f.ComponentTransform();
       barrelTr.mtxLocal.scale(new f.Vector3(0.3, 0.05, 0.05));
@@ -33,9 +33,9 @@ namespace L06_PuzzleGame {
       this.addChild(this.barrel);
       //Grip
       this.grip = new f.Node("grip");
-      let gripMesh: f.ComponentMesh = new f.ComponentMesh(GravityGun.mesh);
+      let gripMesh: f.ComponentMesh = new f.ComponentMesh(Hook.mesh);
       this.grip.addComponent(gripMesh);
-      let gripMat: f.ComponentMaterial = new f.ComponentMaterial(GravityGun.material);
+      let gripMat: f.ComponentMaterial = new f.ComponentMaterial(Hook.material);
       this.grip.addComponent(gripMat);
       let gripTr: f.ComponentTransform = new f.ComponentTransform();
       gripTr.mtxLocal.scale(new f.Vector3(0.05, 0.15, 0.05));
@@ -45,14 +45,14 @@ namespace L06_PuzzleGame {
       this.addChild(this.grip);
       //Audio
       let audioNodePush: f.Node = new f.Node("AudioPush");
-      this.cmpAudioPush = new f.ComponentAudio(GravityGun.audioPush, false, false);
+      this.cmpAudioPush = new f.ComponentAudio(Hook.audioPush, false, false);
       audioNodePush.addComponent(this.cmpAudioPush);
       this.cmpAudioPush.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
       this.cmpAudioPush.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
       this.addChild(audioNodePush);
 
       let audioNodePull: f.Node = new f.Node("AudioPull");
-      this.cmpAudioPull = new f.ComponentAudio(GravityGun.audioPull, false, false);
+      this.cmpAudioPull = new f.ComponentAudio(Hook.audioPull, false, false);
       audioNodePull.addComponent(this.cmpAudioPull);
       this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
       this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);

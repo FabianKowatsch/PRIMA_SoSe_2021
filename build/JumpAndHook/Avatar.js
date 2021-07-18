@@ -1,6 +1,6 @@
 "use strict";
-var L06_PuzzleGame;
-(function (L06_PuzzleGame) {
+var JumpandHook;
+(function (JumpandHook) {
     var f = FudgeCore;
     class Avatar extends f.Node {
         constructor(_cmpCamera, _speed, _force, _weight) {
@@ -39,8 +39,8 @@ var L06_PuzzleGame;
             //audio
             this.camNode.addComponent(new f.ComponentAudioListener());
             //Gun
-            this.gun = new L06_PuzzleGame.GravityGun();
-            this.camNode.addChild(this.gun);
+            this.hook = new JumpandHook.Hook();
+            this.camNode.addChild(this.hook);
         }
         move(_forward, _sideward) {
             let playerForward = this.camNode.mtxLocal.getX();
@@ -76,7 +76,7 @@ var L06_PuzzleGame;
                     this.activeProp = hitInfo.rigidbodyComponent.getContainer();
                 }
             }
-            this.gun.playPullSound();
+            this.hook.playPullSound();
         }
         shootPush() {
             let direction = this.camNode.mtxLocal.getX();
@@ -94,7 +94,7 @@ var L06_PuzzleGame;
                 this.propRigid.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
                 this.propRigid = null;
             }
-            this.gun.playPushSound();
+            this.hook.playPushSound();
         }
         tryGrabLastNode() {
             if (this.activeProp == null || this.hasProp == true)
@@ -152,14 +152,13 @@ var L06_PuzzleGame;
                     //ROPE
                     let nextNode = hitInfo.rigidbodyComponent.getContainer();
                     let rope = new f.Node("Rope");
-                    let cmpScript = new L06_PuzzleGame.ComponentScriptRope(nextNode, 0.05);
-                    console.log("starting");
-                    this.gun.addChild(rope);
+                    let cmpScript = new JumpandHook.ComponentScriptRope(nextNode, 0.05);
+                    this.hook.addChild(rope);
                     rope.addComponent(cmpScript);
                 }
             }
             //this.cmpRigid.applyForce(new f.Vector3(0, this.weight * 111, 0));
-            // this.gun.playPushSound();
+            this.hook.playPushSound();
         }
         checkIfGrounded() {
             let hitInfo;
@@ -179,6 +178,6 @@ var L06_PuzzleGame;
             return f.Physics.raycast(origin, direction, _distance);
         }
     }
-    L06_PuzzleGame.Avatar = Avatar;
-})(L06_PuzzleGame || (L06_PuzzleGame = {}));
+    JumpandHook.Avatar = Avatar;
+})(JumpandHook || (JumpandHook = {}));
 //# sourceMappingURL=Avatar.js.map
