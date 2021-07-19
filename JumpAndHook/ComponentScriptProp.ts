@@ -8,7 +8,7 @@ namespace JumpandHook {
       this.addEventListener(f.EVENT.COMPONENT_ADD, this.hndComponentAdd.bind(this));
     }
 
-    private hndComponentAdd(_event: f.Eventƒ): void {
+    protected hndComponentAdd(_event: f.Eventƒ): void {
       this.getContainer().getComponent(f.ComponentRigidbody).addEventListener(f.EVENT_PHYSICS.COLLISION_ENTER, this.onCollision.bind(this));
     }
 

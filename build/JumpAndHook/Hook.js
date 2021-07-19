@@ -50,6 +50,12 @@ var JumpandHook;
                 this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
                 this.addChild(audioNodePull);
             }
+            useRope(_targetNode) {
+                let rope = new f.Node("Rope");
+                let cmpScript = new JumpandHook.ComponentScriptRope(_targetNode, 0.05);
+                this.addChild(rope);
+                rope.addComponent(cmpScript);
+            }
             playPushSound() {
                 this.cmpAudioPush.play(true);
             }

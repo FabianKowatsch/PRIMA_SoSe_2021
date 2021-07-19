@@ -67,13 +67,21 @@ var JumpandHook;
                 this.movementSpeed = this.defaultSpeed;
         }
         shootPull() {
-            if (this.hasProp == false) {
+            if (!this.hasProp) {
                 let direction = this.camNode.mtxLocal.getX();
                 direction.normalize();
                 let hitInfo = this.avatarHitInfo(10);
-                if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType != 1) {
-                    hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
-                    this.activeProp = hitInfo.rigidbodyComponent.getContainer();
+                if (hitInfo.hit) {
+                    switch (hitInfo.rigidbodyComponent.physicsType) {
+                        case f.PHYSICS_TYPE.STATIC:
+                            this.cmpRigid.applyImpulseAtPoint(f.Vector3.SCALE(direction, 1000));
+                            break;
+                        case f.PHYSICS_TYPE.DYNAMIC:
+                            hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, -100));
+                            this.activeProp = hitInfo.rigidbodyComponent.getContainer();
+                            break;
+                    }
+                    this.hook.useRope(hitInfo.rigidbodyComponent.getContainer());
                 }
             }
             this.hook.playPullSound();
@@ -85,6 +93,7 @@ var JumpandHook;
                 let hitInfo = this.avatarHitInfo(10);
                 if (hitInfo.hit) {
                     if (hitInfo.rigidbodyComponent.physicsType != 1) {
+                        this.hook.useRope(hitInfo.rigidbodyComponent.getContainer());
                         hitInfo.rigidbodyComponent.applyImpulseAtPoint(f.Vector3.SCALE(direction, 100));
                     }
                 }
@@ -142,23 +151,6 @@ var JumpandHook;
                     this.propRigid = null;
                 }
             }
-        }
-        useHook() {
-            let direction = this.camNode.mtxLocal.getX();
-            direction.normalize();
-            if (!this.hasProp) {
-                let hitInfo = this.avatarHitInfo(10);
-                if (hitInfo.hit && hitInfo.rigidbodyComponent.physicsType == 1) {
-                    //ROPE
-                    let nextNode = hitInfo.rigidbodyComponent.getContainer();
-                    let rope = new f.Node("Rope");
-                    let cmpScript = new JumpandHook.ComponentScriptRope(nextNode, 0.05);
-                    this.hook.addChild(rope);
-                    rope.addComponent(cmpScript);
-                }
-            }
-            //this.cmpRigid.applyForce(new f.Vector3(0, this.weight * 111, 0));
-            this.hook.playPushSound();
         }
         checkIfGrounded() {
             let hitInfo;

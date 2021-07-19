@@ -54,7 +54,6 @@ namespace JumpandHook {
   function update(): void {
     f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
     checkKeyboardInputs();
-    checkCollisions();
     avatar.move(forwardMovement, sideMovement);
     avatar.tryGrabLastNode();
     f.AudioManager.default.update();
@@ -141,13 +140,6 @@ namespace JumpandHook {
     }
   }
 
-  function checkCollisions(): void {
-    let props: f.Node = root.getChildrenByName("Props")[0];
-    for (let prop of props.getChildren() as Prop[]) {
-      prop.cmpRigid.checkCollisionEvents();
-    }
-  }
-
   function hndKeyDown(_event: KeyboardEvent): void {
     if (_event.code == f.KEYBOARD_CODE.W) {
       forwardMovement = 1;
@@ -166,9 +158,6 @@ namespace JumpandHook {
     }
     if (_event.code == f.KEYBOARD_CODE.E) {
       avatar.switchCloseNode();
-    }
-    if (_event.code == f.KEYBOARD_CODE.F) {
-      avatar.useHook();
     }
     if (_event.code == f.KEYBOARD_CODE.Y) {
       f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;

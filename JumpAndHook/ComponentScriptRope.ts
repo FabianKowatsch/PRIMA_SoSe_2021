@@ -6,13 +6,13 @@ namespace JumpandHook {
     public name: string = "CmpScriptRope";
     private pivotNode: f.Node;
     private ropeNode: f.Node;
-    private target: f.Node;
+    private targetNode: f.Node;
     private animationFactor: number;
     private currentScaling: number = 1;
     private towards: boolean = true;
     constructor(_target: f.Node, _animFactor: number) {
       super();
-      this.target = _target;
+      this.targetNode = _target;
       this.animationFactor = _animFactor;
       this.addEventListener(f.EVENT.COMPONENT_ADD, this.hndAdd);
     }
@@ -26,7 +26,7 @@ namespace JumpandHook {
       let cmpTransform: f.ComponentTransform = new f.ComponentTransform();
       this.pivotNode.addComponent(cmpTransform);
       this.pivotNode.mtxLocal.translateX(0.15);
-      this.pivotNode.mtxLocal.lookAt(this.target.mtxWorld.translation);
+      this.pivotNode.mtxLocal.lookAt(this.targetNode.mtxWorld.translation);
       this.ropeNode.addComponent(new f.ComponentMaterial(ComponentScriptRope.material));
       this.ropeNode.addComponent(new f.ComponentMesh(ComponentScriptRope.mesh));
       let ropeTransform: f.ComponentTransform = new f.ComponentTransform();
@@ -41,8 +41,8 @@ namespace JumpandHook {
       let currentTransform: f.ComponentTransform = this.pivotNode.getComponent(f.ComponentTransform);
       let gun: f.Node = this.pivotNode.getParent();
       let gunPos: f.Vector3 = gun.mtxWorld.translation;
-      let nodePos: f.Vector3 = this.target.mtxWorld.translation;
-      let distance: f.Vector3 = this.target.mtxWorld.translation;
+      let nodePos: f.Vector3 = this.targetNode.mtxWorld.translation;
+      let distance: f.Vector3 = this.targetNode.mtxWorld.translation;
       distance.subtract(gunPos);
       if (currentTransform.mtxLocal.scaling.z < distance.magnitude && this.towards) {
         currentTransform.lookAt(nodePos);

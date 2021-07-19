@@ -58,7 +58,12 @@ namespace JumpandHook {
       this.cmpAudioPull.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
       this.addChild(audioNodePull);
     }
-
+    public useRope(_targetNode: f.Node): void {
+      let rope: f.Node = new f.Node("Rope");
+      let cmpScript: ComponentScriptRope = new ComponentScriptRope(_targetNode, 0.05);
+      this.addChild(rope);
+      rope.addComponent(cmpScript);
+    }
     public playPushSound(): void {
       this.cmpAudioPush.play(true);
     }

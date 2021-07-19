@@ -46,7 +46,6 @@ var JumpandHook;
     function update() {
         f.Physics.world.simulate(f.Loop.timeFrameReal / 1000);
         checkKeyboardInputs();
-        checkCollisions();
         avatar.move(forwardMovement, sideMovement);
         avatar.tryGrabLastNode();
         f.AudioManager.default.update();
@@ -128,12 +127,6 @@ var JumpandHook;
             avatar.jump();
         }
     }
-    function checkCollisions() {
-        let props = root.getChildrenByName("Props")[0];
-        for (let prop of props.getChildren()) {
-            prop.cmpRigid.checkCollisionEvents();
-        }
-    }
     function hndKeyDown(_event) {
         if (_event.code == f.KEYBOARD_CODE.W) {
             forwardMovement = 1;
@@ -152,9 +145,6 @@ var JumpandHook;
         }
         if (_event.code == f.KEYBOARD_CODE.E) {
             avatar.switchCloseNode();
-        }
-        if (_event.code == f.KEYBOARD_CODE.F) {
-            avatar.useHook();
         }
         if (_event.code == f.KEYBOARD_CODE.Y) {
             f.Physics.settings.debugDraw = !f.Physics.settings.debugDraw;
