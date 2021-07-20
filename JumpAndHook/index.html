@@ -13,6 +13,8 @@
     <script src="../build/JumpandHook/ComponentScriptRope.js"></script>
     <script src="../build/JumpandHook/Avatar.js"></script>
     <script src="../build/JumpandHook/ComponentScriptProp.js"></script>
+    <script src="../build/JumpandHook/ComponentScriptTrap.js"></script>
+    <script src="../build/JumpandHook/ComponentScriptPlatform.js"></script>
     <script src="../build/JumpandHook/main.js"></script>
     <!--Link stylesheet and internal resources-->
     <link rel="stylesheet" href="styles.css" />
@@ -24,6 +26,10 @@
     <div class="wrapper">
       <canvas class="fullscreen"></canvas>
       <div class="crosshair"></div>
+
+      <div id="ui">
+        <input type="text" key="score" placeholder="6" min="0" max="10" disabled />
+      </div>
     </div>
   </body>
 </html>

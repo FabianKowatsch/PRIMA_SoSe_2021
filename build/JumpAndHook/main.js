@@ -8,8 +8,8 @@ var JumpandHook;
     let cmpCamera;
     let avatar;
     let root = new f.Graph("root");
-    let props;
-    const propAmount = 12;
+    // let props: f.Node;
+    // const propAmount: number = 12;
     const camSpeed = -0.15;
     let isLocked = false;
     let forwardMovement = 0;
@@ -27,7 +27,7 @@ var JumpandHook;
         viewport = new f.Viewport();
         initPhysics();
         createAvatar();
-        createProps();
+        setStartingPlatform();
         createRigidbodies();
         viewport.initialize("Viewport", root, cmpCamera, app);
         f.AudioManager.default.listenTo(root);
@@ -50,7 +50,6 @@ var JumpandHook;
         avatar.tryGrabLastNode();
         f.AudioManager.default.update();
         viewport.draw();
-        // Tools.drawLine(viewport, new f.Vector3(2, 2, 3), new f.Vector3(1, 2, 3));
     }
     function initPhysics() {
         f.Physics.initializePhysics();
@@ -63,6 +62,11 @@ var JumpandHook;
         cmpCamera = new f.ComponentCamera();
         avatar = new JumpandHook.Avatar(cmpCamera, config.speed, config.jumpforce, config.weight);
         root.appendChild(avatar);
+    }
+    function setStartingPlatform() {
+        let level = root.getChildrenByName("level")[0];
+        let firstPlatform = level.getChildrenByName("platform0")[0];
+        firstPlatform.addComponent(new JumpandHook.ComponentScriptPlatform(0, true, 10));
     }
     function createRigidbodies() {
         let level = root.getChildrenByName("level")[0];
@@ -98,23 +102,6 @@ var JumpandHook;
             }
             node.addComponent(cmpRigid);
         }
-    }
-    function createProps() {
-        props = new f.Node("Props");
-        for (let i = 0; i < propAmount; i++) {
-            let random = Math.random();
-            let randomPos = random + i;
-            let randomScale = 1 + random;
-            if (random >= 0.5) {
-                let prop = new JumpandHook.CubeProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-                props.addChild(prop);
-            }
-            else {
-                let prop = new JumpandHook.SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-                props.addChild(prop);
-            }
-        }
-        root.addChild(props);
     }
     function hndMouseMovement(_event) {
         if (isLocked) {

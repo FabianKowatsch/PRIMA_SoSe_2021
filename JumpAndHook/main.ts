@@ -12,8 +12,8 @@ namespace JumpandHook {
   let cmpCamera: f.ComponentCamera;
   let avatar: Avatar;
   let root: f.Graph = new f.Graph("root");
-  let props: f.Node;
-  const propAmount: number = 12;
+  // let props: f.Node;
+  // const propAmount: number = 12;
   const camSpeed: number = -0.15;
   let isLocked: boolean = false;
   let forwardMovement: number = 0;
@@ -34,7 +34,7 @@ namespace JumpandHook {
     viewport = new f.Viewport();
     initPhysics();
     createAvatar();
-    createProps();
+    setStartingPlatform();
     createRigidbodies();
     viewport.initialize("Viewport", root, cmpCamera, app);
     f.AudioManager.default.listenTo(root);
@@ -58,7 +58,6 @@ namespace JumpandHook {
     avatar.tryGrabLastNode();
     f.AudioManager.default.update();
     viewport.draw();
-    // Tools.drawLine(viewport, new f.Vector3(2, 2, 3), new f.Vector3(1, 2, 3));
   }
   function initPhysics(): void {
     f.Physics.initializePhysics();
@@ -71,6 +70,12 @@ namespace JumpandHook {
     cmpCamera = new f.ComponentCamera();
     avatar = new Avatar(cmpCamera, config.speed, config.jumpforce, config.weight);
     root.appendChild(avatar);
+  }
+
+  function setStartingPlatform(): void {
+    let level: f.Node = root.getChildrenByName("level")[0];
+    let firstPlatform: f.Node = level.getChildrenByName("platform0")[0];
+    firstPlatform.addComponent(new ComponentScriptPlatform(0, true, 10));
   }
 
   function createRigidbodies(): void {
@@ -108,23 +113,6 @@ namespace JumpandHook {
       }
       node.addComponent(cmpRigid);
     }
-  }
-
-  function createProps(): void {
-    props = new f.Node("Props");
-    for (let i: number = 0; i < propAmount; i++) {
-      let random: number = Math.random();
-      let randomPos: number = random + i;
-      let randomScale: number = 1 + random;
-      if (random >= 0.5) {
-        let prop: CubeProp = new CubeProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-        props.addChild(prop);
-      } else {
-        let prop: SphereProp = new SphereProp(`prop-${i}`, new f.Vector3(randomPos, randomPos, randomPos), new f.Vector3(randomScale, randomScale, randomScale));
-        props.addChild(prop);
-      }
-    }
-    root.addChild(props);
   }
 
   function hndMouseMovement(_event: MouseEvent): void {
