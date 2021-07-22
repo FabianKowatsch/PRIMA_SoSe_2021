@@ -3,7 +3,7 @@ var JumpandHook;
 (function (JumpandHook) {
     var f = FudgeCore;
     let SphereProp = /** @class */ (() => {
-        class SphereProp extends JumpandHook.Prop {
+        class SphereProp extends Prop {
             constructor(_name, _position, _scale) {
                 super(_name, _position, _scale, SphereProp.mesh, f.COLLIDER_TYPE.SPHERE);
             }

@@ -13,7 +13,6 @@ namespace JumpandHook {
     private triggerNode: f.Node;
     private deathNode: f.Node;
     private isFirst: boolean;
-    private activatedNext: boolean = false;
     constructor(_index: number, _isFirst: boolean, _timeLoss: number) {
       super();
       this.mesh = <f.Mesh>f.Project.resources[ComponentScriptPlatform.meshId];
@@ -31,22 +30,26 @@ namespace JumpandHook {
 
       if (!this.isFirst) {
         let transform: f.Matrix4x4 = new f.Matrix4x4();
-        transform.translate(new f.Vector3(ComponentScriptPlatform.translationFactor * this.index, 0, 0));
+        transform.translate(new f.Vector3(ComponentScriptPlatform.translationFactor * this.index, 0, Math.random() * 4 - 2));
         this.node.addComponent(new f.ComponentTransform(transform));
         this.node.addComponent(new f.ComponentMaterial(new f.Material("MaterialPlatform", f.ShaderFlat, new f.CoatColored(f.Color.CSS("white")))));
         let mesh: f.ComponentMesh = new f.ComponentMesh(this.mesh);
         mesh.mtxPivot.scale(new f.Vector3(15, 1, 10));
         this.node.addComponent(mesh);
         this.addNextNode();
-        this.node.addComponent(new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT));
+        let cmpRigid: f.ComponentRigidbody = new f.ComponentRigidbody(100, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.DEFAULT);
+        cmpRigid.restitution = 0;
+        cmpRigid.friction = 10;
+        this.node.addComponent(cmpRigid);
         // this.addTraps();
       }
       this.addDeathTrigger();
       this.addNextTrigger();
       f.Physics.adjustTransforms(this.node.getParent(), true);
+      let timeout: number = 10000 - this.index * this.timeLoss;
       setTimeout(() => {
         this.sinkPlatform();
-      }, 10000 - this.index * this.timeLoss);
+      }, timeout);
     };
 
     private addNextNode(): void {
@@ -66,7 +69,7 @@ namespace JumpandHook {
       let cmpRigid: f.ComponentRigidbody = new f.ComponentRigidbody(0, f.PHYSICS_TYPE.STATIC, f.COLLIDER_TYPE.CUBE, f.PHYSICS_GROUP.TRIGGER);
       this.triggerNode.addComponent(cmpRigid);
       this.triggerNode.addComponent(new f.ComponentTransform());
-      this.triggerNode.mtxLocal.scale(new f.Vector3(2, 2, 10));
+      this.triggerNode.mtxLocal.scale(new f.Vector3(2, 6, 10));
       this.triggerNode.mtxLocal.translate(new f.Vector3(3.5, 0, 0));
       this.node.appendChild(this.triggerNode);
       f.Physics.adjustTransforms(this.node.getAncestor(), true);
@@ -93,7 +96,7 @@ namespace JumpandHook {
       }
 
       trapArray.forEach((trap) => {
-        trap.addComponent(new ComponentScriptTrap());
+        trap.addComponent(new CmpScriptTrap(this.mesh, this.material));
       });
     }
 
@@ -102,17 +105,23 @@ namespace JumpandHook {
         let nextPlatform: f.Node = new f.Node("platform" + this.index + 1);
         this.node.getParent().addChild(nextPlatform);
         nextPlatform.addComponent(new ComponentScriptPlatform(this.index + 1, false, this.timeLoss));
-        this.activatedNext = true;
         let trigger: f.ComponentRigidbody = this.triggerNode.getComponent(f.ComponentRigidbody);
         trigger.removeEventListener(f.EVENT_PHYSICS.COLLISION_ENTER, this.spawnNextPlatform);
         this.triggerNode.removeComponent(trigger);
+        game.solvedPlatforms++;
+        uiLive.score = game.solvedPlatforms;
       }
     };
 
     private setGameOverState = (_event: f.EventPhysics) => {
+      let enteredNode: f.Node = _event.cmpRigidbody.getContainer();
       if (_event.cmpRigidbody.physicsType != 1) {
-        console.log(_event.cmpRigidbody.physicsType);
-        console.log("game over");
+        if (enteredNode.name === "Avatar") {
+          game.state = GAMESTATE.MENU;
+        } else {
+          enteredNode.removeComponent(_event.cmpRigidbody);
+          enteredNode.getAncestor().removeChild(enteredNode);
+        }
       }
     };
 

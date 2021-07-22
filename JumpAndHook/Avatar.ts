@@ -1,6 +1,7 @@
 namespace JumpandHook {
   import f = FudgeCore;
   export class Avatar extends f.Node {
+    private static audioBG: f.Audio = new f.Audio("../../JumpAndHook/Assets/Sound/soundtrack.mp3");
     public cmpCamera: f.ComponentCamera;
     public cmpRigid: f.ComponentRigidbody;
     public camNode: f.Node = new f.Node("Cam");
@@ -13,8 +14,9 @@ namespace JumpandHook {
     private activeProp: f.Node = null;
     private hasProp: boolean = false;
     private propRigid: f.ComponentRigidbody = null;
+    private cmpAudio: f.ComponentAudio;
 
-    constructor(_cmpCamera: f.ComponentCamera, _speed: number, _force: number, _weight: number) {
+    constructor(_cmpCamera: f.ComponentCamera, _speed: number, _force: number, _weight: number, _disableMusic: boolean) {
       super("Avatar");
       //Properties
       this.weight = _weight;
@@ -47,6 +49,15 @@ namespace JumpandHook {
       //Gun
       this.hook = new Hook();
       this.camNode.addChild(this.hook);
+
+      this.cmpAudio = new f.ComponentAudio(Avatar.audioBG, true, !_disableMusic);
+      this.cmpAudio.volume = 1;
+      this.camNode.addComponent(this.cmpAudio);
+      this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_OUTER_ANGLE, 360);
+      this.cmpAudio.setPanner(f.AUDIO_PANNER.CONE_INNER_ANGLE, 360);
+    }
+    public setVolume(_volume: number): void {
+      this.cmpAudio.volume = 1 * (_volume / 100);
     }
 
     public move(_forward: number, _sideward: number): void {
